@@ -47,29 +47,6 @@
 					}
 				]
 			}
-		],
-		"rewrites": [
-			{
-				"source": "/api/inquiry",
-				"function": {
-					"functionId": "inquiry",
-					"region": "us-central1"
-				}
-			}
 		]
-	},
-	"functions": [
-		{
-			"source": "functions",
-			"codebase": "default",
-			"runtime": "nodejs22",
-			"ignore": [
-				"node_modules",
-				".git",
-				"*.log",
-				"pnpm-lock.yaml",
-				"pnpm-workspace.yaml"
-			]
-		}
-	]
+	}
 }

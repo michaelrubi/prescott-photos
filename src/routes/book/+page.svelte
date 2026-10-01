@@ -30,17 +30,21 @@
 		const data = Object.fromEntries(new FormData(form)) as Record<string, string>;
 		if (data.botcheck) return;
 
+		if (!site.inquiryWebhook) {
+			status = 'error';
+			error = "The booking form isn't connected yet. Please message me on Instagram or Facebook for now.";
+			return;
+		}
+
 		status = 'sending';
 		const typeLabel = sessionTypes.find((s) => s.id === data.type)?.label ?? data.type;
 		try {
-			// Handled by the `inquiry` Firebase function (functions/index.js)
-			const response = await fetch('/api/inquiry', {
+			const response = await fetch(site.inquiryWebhook, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ ...data, type: typeLabel })
+				body: JSON.stringify({ ...data, type: typeLabel, page: location.href, sentAt: new Date().toISOString() })
 			});
-			const result = await response.json().catch(() => ({}));
-			if (!response.ok || !result.success) throw new Error(result.message);
+			if (!response.ok) throw new Error(`Webhook responded ${response.status}`);
 			firstName = data.name.trim().split(/\s+/)[0];
 			status = 'sent';
 			await tick();

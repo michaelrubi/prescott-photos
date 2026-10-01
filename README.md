@@ -32,11 +32,7 @@ Old URLs from the previous site (`/portfolio`, `/pricing`, `/contact`) redirect 
 
 ### Booking form
 
-The Book page posts to `/api/inquiry`, which Firebase Hosting rewrites to the `inquiry` Cloud Function in `functions/`. It emails each inquiry through [Resend](https://resend.com) with Reply-To set to the client. CI deploys Hosting only; deploy the function yourself when it changes:
-
-1. Put the Firebase project on the pay-as-you-go (Blaze) plan. Cloud Functions and Secret Manager need it; this traffic stays within the free tier.
-2. Create a Resend account with the inbox you want inquiries sent to, and create an API key.
-3. Run `pnpm deploy:functions`. The first deploy asks for two secrets: `RESEND_API_KEY` and `INQUIRY_EMAIL` (the inbox, which must match the Resend account email until a domain is verified in Resend).
+The Book page posts each inquiry as JSON straight from the browser to an n8n webhook, set as `inquiryWebhook` in `src/lib/site.ts`. Fields: `name`, `email`, `type`, `package`, `dates`, `source`, `message`, `page`, `sentAt`. Any `2xx` response counts as sent. In n8n, set the Webhook node to respond immediately and add this site's origins (prescottphotos.com and the `rubi-photo--*.web.app` preview URLs, or `*`) under **Allowed Origins (CORS)**.
 
 Site copy that repeats across pages or changes often (packages, prices, policies, FAQs, locations) lives in `src/lib/content.ts`.
 

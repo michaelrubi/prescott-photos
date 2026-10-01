@@ -1,4 +1,0 @@
-# Separate from the site's workspace: Cloud Build installs this folder on its own.
-allowBuilds:
-  '@firebase/util': false
-  protobufjs: false

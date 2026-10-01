@@ -9,7 +9,12 @@ export const site = {
 	social: {
 		instagram: 'https://www.instagram.com/rubigram/',
 		facebook: 'https://www.facebook.com/MichaelRubiPhoto/'
-	}
+	},
+	/**
+	 * n8n webhook (POST, JSON) that receives booking inquiries and notifies
+	 * Michael. It's called from the browser, so it must allow this site's origin.
+	 */
+	inquiryWebhook: 'https://n8n.rubiconetic.com/webhook/7fa008b1-a6b8-4664-9075-5434e66e4409'
 } as const;
 
 export const nav = [

@@ -13,8 +13,8 @@
 		<h2>What I collect</h2>
 		<p>
 			When you send an inquiry through the booking form, I receive the details you enter: your name, email address,
-			session preferences and message. It is sent to my inbox through Google Firebase and the email service Resend,
-			which process it only to deliver that email.
+			session preferences and message. It goes to a private automation server I run, which
+			only uses it to notify me about your inquiry.
 		</p>
 		<p>
 			This website does not use advertising trackers or analytics cookies. The hosting provider, Google Firebase,
