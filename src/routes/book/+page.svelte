@@ -39,17 +39,19 @@
 		status = 'sending';
 		const typeLabel = sessionTypes.find((s) => s.id === data.type)?.label ?? data.type;
 		try {
+			// Sent as a plain form post (no custom headers) so the browser skips the
+			// CORS preflight; n8n still parses the fields into the webhook body.
 			const response = await fetch(site.inquiryWebhook, {
 				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ ...data, type: typeLabel, page: location.href, sentAt: new Date().toISOString() })
+				body: new URLSearchParams({ ...data, type: typeLabel, page: location.href, sentAt: new Date().toISOString() })
 			});
 			if (!response.ok) throw new Error(`Webhook responded ${response.status}`);
 			firstName = data.name.trim().split(/\s+/)[0];
 			status = 'sent';
 			await tick();
 			sentHeading?.focus();
-		} catch {
+		} catch (err) {
+			console.error('Inquiry failed:', err);
 			status = 'error';
 			error = 'Something went wrong sending your message. Please try again in a minute, or message me on Instagram or Facebook.';
 		}
