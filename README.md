@@ -6,14 +6,14 @@ Built with SvelteKit 3 (release candidate), Svelte 5, vanilla CSS and GSAP. Ever
 
 ## Develop
 
-Requires Node 22.17 or newer.
+Requires Node 22.17 or newer and pnpm (the version is pinned in `package.json`; `corepack enable` picks it up).
 
 ```sh
-npm install
-npm run dev      # local dev server
-npm run check    # type-check
-npm run build    # static site in ./build
-npm run preview  # serve the production build
+pnpm install
+pnpm dev      # local dev server
+pnpm check    # type-check
+pnpm build    # static site in ./build
+pnpm preview  # serve the production build
 ```
 
 Imports from `src/lib` use Node subpath imports: `import { site } from '#lib/site.ts'` (SvelteKit 3 replaced `$lib` with `#lib`).
@@ -32,7 +32,7 @@ One-time setup in the GitHub repo settings:
 | Variable | `FIREBASE_PROJECT_ID` | The Firebase project id |
 | Secret | `FIREBASE_SERVICE_ACCOUNT` | JSON key for a service account with the Firebase Hosting Admin role |
 
-Running `npx firebase-tools init hosting:github` creates the service account and secret for you. Until the variable is set, CI only builds.
+Running `pnpm dlx firebase-tools init hosting:github` creates the service account and secret for you. Until the variable is set, CI only builds.
 
 Old URLs from the previous site (`/portfolio`, `/pricing`, `/contact`) redirect in `firebase.json`.
 
