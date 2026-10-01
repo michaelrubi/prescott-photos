@@ -20,7 +20,7 @@ export const site = {
 	 * from a proofing gallery. Empty means no notification; picks still show
 	 * up on /g/admin.
 	 */
-	picksWebhook: ''
+	picksWebhook: 'https://n8n.rubiconetic.com/webhook/c125007b-d63c-49a8-859c-7518acab38c4'
 } as const;
 
 export const nav = [

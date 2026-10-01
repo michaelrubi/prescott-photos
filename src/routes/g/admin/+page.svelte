@@ -296,10 +296,12 @@
 			<button class="primary" type="button" onclick={signIn}>Sign in with Google</button>
 		</div>
 	{:else if view === 'denied'}
-		<p class="panel">
-			{user?.email} can't manage galleries. Sign out and use the studio account, or add this address to
-			<code>firestore.rules</code>.
-		</p>
+		<div class="panel">
+			<p>
+				{user?.email} can't manage galleries. Sign out and use an admin account, or add this address to
+				<code>firestore.rules</code> and deploy the rules again.
+			</p>
+		</div>
 	{:else if !selected}
 		<section class="grid-2">
 			<form class="panel form" onsubmit={create}>
@@ -348,7 +350,7 @@
 			</section>
 		</section>
 	{:else if !current}
-		<p class="panel">That gallery doesn't exist. <a href="#list">Back to galleries</a></p>
+		<div class="panel"><p>That gallery doesn't exist. <a href="#list">Back to galleries</a></p></div>
 	{:else}
 		<section class="share panel">
 			<div>
