@@ -4,6 +4,11 @@ export const site = {
 	url: 'https://prescottphotos.com',
 	locale: 'en_US',
 	region: 'Prescott, Arizona',
+	/**
+	 * Name set next to the logo in the header. To brand as Prescott Photos, use
+	 * { name: 'Prescott Photos', tagline: 'By Michael Rubi' }.
+	 */
+	brand: { name: 'Michael Rubi', tagline: 'Photography · Prescott AZ' },
 	/** Towns sessions are offered in without a travel fee, used in copy and structured data */
 	serviceArea: ['Prescott', 'Prescott Valley', 'Chino Valley', 'Dewey-Humboldt', 'Sedona'],
 	social: {

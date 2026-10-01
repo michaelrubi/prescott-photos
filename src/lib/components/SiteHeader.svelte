@@ -1,16 +1,17 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { nav } from '#lib/site.ts';
+	import { nav, site } from '#lib/site.ts';
 	import Button from './Button.svelte';
+	import Logo from './Logo.svelte';
 </script>
 
 <header>
-	<a class="mark" href="/" aria-label="Michael Rubi Photography, home">
-		<svg viewBox="0 0 32 32" aria-hidden="true">
-			<path d="M7 11V7h4M21 7h4v4M25 21v4h-4M11 25H7v-4" fill="none" stroke="currentColor" stroke-width="2" />
-			<circle cx="16" cy="16" r="2" fill="currentColor" />
-		</svg>
-		<span>Michael Rubi</span>
+	<a class="mark" href="/" aria-label="{site.name}, home">
+		<Logo />
+		<span class="wordmark">
+			<span class="name">{site.brand.name}</span>
+			<span class="tagline">{site.brand.tagline}</span>
+		</span>
 	</a>
 	<nav aria-label="Main">
 		<ul>
@@ -43,13 +44,27 @@
 	.mark {
 		display: flex;
 		align-items: center;
-		gap: var(--space-2);
-		font-weight: 600;
-		letter-spacing: -0.01em;
+		gap: 0.625rem;
 		text-decoration: none;
 	}
-	.mark svg {
-		width: 1.5rem;
+	.mark :global(.logo) {
+		width: 2.5rem;
+		height: 2.5rem;
+	}
+	.wordmark {
+		display: grid;
+		gap: 0.3rem;
+	}
+	.name {
+		font-size: 1.0625rem;
+		font-weight: 600;
+		line-height: 1;
+		letter-spacing: -0.03em;
+	}
+	.tagline {
+		font: 500 0.5625rem / 1 var(--font-mono);
+		letter-spacing: 0.16em;
+		text-transform: uppercase;
 		color: var(--color-accent);
 	}
 	nav {
@@ -93,7 +108,7 @@
 		header {
 			gap: var(--space-3);
 		}
-		.mark span {
+		.wordmark {
 			display: none;
 		}
 		ul {
