@@ -5,8 +5,14 @@
 	import SectionHead from '#lib/components/SectionHead.svelte';
 	import Seo from '#lib/components/Seo.svelte';
 	import { testimonials } from '#lib/content.ts';
+	import { pictures, shareImages } from '#lib/photos.ts';
 	import { reveal } from '#lib/motion/reveal.ts';
 	import { person } from '#lib/schema.ts';
+
+	// Michael's own photo: any JPG dropped in photos/about/ (the first by name)
+	const mine = Object.keys(pictures)
+		.filter((path) => path.startsWith('/photos/about/'))
+		.sort()[0];
 
 	const principles = [
 		{
@@ -27,6 +33,7 @@
 <Seo
 	title="About Michael Rubi | Portrait Photographer in Prescott, AZ"
 	description="Michael Rubi is a portrait photographer in Prescott, Arizona and a 14-year US Air Force veteran who makes being photographed feel easy."
+	image={mine && shareImages[mine]}
 	jsonld={[{ '@type': 'AboutPage', mainEntity: person }]}
 />
 
@@ -39,7 +46,11 @@
 
 	<section class="story">
 		<div class="portrait">
-			<Frame label="Portrait of Michael Rubi" tone="dusk" ratio="4 / 5" />
+			<Frame label="Portrait of Michael Rubi" tone="dusk" ratio="4 / 5">
+				{#if mine}
+					<enhanced:img src={pictures[mine]} alt="" sizes="(min-width: 48rem) 40vw, 90vw" />
+				{/if}
+			</Frame>
 		</div>
 		<div class="copy" {@attach reveal({ stagger: 0.08 })}>
 			<p class="first">
@@ -110,6 +121,13 @@
 	.portrait {
 		position: sticky;
 		top: 6rem;
+	}
+	.portrait :global(picture),
+	.portrait :global(img) {
+		display: block;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
 	}
 	.copy {
 		display: grid;
