@@ -20,7 +20,7 @@ export function business(image?: string) {
 		legalName: site.legalName,
 		url: site.url,
 		image: image && new URL(image, site.url).href,
-		description: 'Portrait photography in Prescott, Arizona: headshots, personal branding, seniors, couples and families.',
+		description: 'Portrait photography in Prescott, Arizona: maternity, creative and themed portraits, milestones, headshots and couples.',
 		priceRange: '$$',
 		address: { '@type': 'PostalAddress', addressLocality: 'Prescott', addressRegion: 'AZ', addressCountry: 'US' },
 		areaServed: site.serviceArea.map((name) => ({ '@type': 'City', name: `${name}, AZ` })),

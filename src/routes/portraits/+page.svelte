@@ -25,7 +25,7 @@
 
 <Seo
 	title="Portrait Photographer in Prescott, AZ | Michael Rubi"
-	description="Relaxed, guided portrait sessions in Prescott, Arizona for headshots, personal branding, seniors and milestones. Hand-edited images from ${startingPrice}."
+	description="Relaxed, guided portrait sessions in Prescott, Arizona: maternity, creative and themed shoots, milestones and headshots. Hand-edited images from ${startingPrice}."
 	jsonld={[service, faqPage(portraitFaqs)]}
 />
 
@@ -33,7 +33,7 @@
 	<PageIntro
 		label="Portraits · Prescott, AZ"
 		title={'Portraits for people\nwho hate having\ntheir photo taken.'}
-		lead="Relaxed, guided sessions around Prescott for headshots, personal branding, seniors and the milestones worth marking. You bring yourself; I handle the rest."
+		lead="Relaxed, guided sessions around Prescott for maternity, creative ideas, headshots and the milestones worth marking. You bring yourself; I handle the rest."
 	>
 		<Button href="/book?type=portrait">Book a portrait session</Button>
 		<Button href="/sessions" variant="ghost">From ${startingPrice}</Button>

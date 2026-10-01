@@ -25,6 +25,10 @@ export interface PhotoMeta {
 	width: number;
 	height: number;
 	capture: Capture;
+	/** Chosen as the home page hero in photos.json */
+	hero?: boolean;
+	/** CSS object-position used wherever the photo is cropped */
+	focus?: string;
 	/** Tiny blurred preview (ThumbHash rendered to a PNG data URL) */
 	placeholder: string;
 }

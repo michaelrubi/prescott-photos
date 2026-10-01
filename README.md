@@ -75,3 +75,16 @@ When a client sends picks, the page posts them (URL-encoded, like the booking fo
 ### Local development
 
 `pnpm dev:proofing` runs the site against local Firestore and Auth emulators (needs the Firebase CLI and Java 21+); the admin's sign-in button signs in as the studio account without Google. `pnpm test:rules` tests `firestore.rules` against the emulator. Plain `pnpm dev` uses the real project through the dev server's proxy.
+
+Photos appear in the order they're listed in `photos.json`. Two optional keys: `"hero": true` picks the home page's full-screen photo (and the default share image), and `"focus": "48% 50%"` sets which part stays in frame when a photo is cropped. A category folder with no photos is hidden from the portfolio filter.
+
+Camera settings (focal length, aperture, shutter, ISO) are read from each JPG's EXIF automatically. If an export stripped them, add them by hand with a `capture` key, which also overrides any single EXIF value:
+
+```json
+"MJR09665.jpg": {
+  "alt": "…",
+  "capture": { "lens": "85mm", "aperture": "f/1.8", "shutter": "1/500", "iso": 100 }
+}
+```
+
+At build time every photo is resized to several widths in AVIF and WebP (metadata, including GPS, is stripped), given a tiny ThumbHash blur placeholder, and its lens, aperture, shutter and ISO are read for the captions. `node scripts/make-sample-photos.js` generates placeholder images for testing.

@@ -43,7 +43,7 @@ export const packages: Package[] = [
 		id: 'full-story',
 		name: 'Full Story',
 		price: 650,
-		summary: 'For branding libraries, seniors and big milestones that deserve variety.',
+		summary: 'For maternity, creative concepts and big milestones that deserve variety.',
 		session: '90 minutes · 2 locations',
 		images: '40+ edited images',
 		includes: [
@@ -145,22 +145,22 @@ export const locations = [
 
 export const audiences = [
 	{
-		title: 'Headshots',
-		body: 'For LinkedIn, your company site or your next role. Clean, confident and current.'
+		title: 'Maternity',
+		body: 'Golden light, flowing gowns and red rock, or a clean studio look. Best booked around 30 to 34 weeks.'
 	},
 	{
-		title: 'Personal branding',
-		body: 'A set of images for your website and social media that shows who you are and what you do.'
-	},
-	{
-		title: 'Seniors',
-		body: 'Graduating this year? Photos that feel like you, with time for a few outfits and your favorite spots.'
+		title: 'Creative and themed',
+		body: 'Have an idea that is a little different? Celestial gowns, fairy lights, a Halloween concept. Let’s plan it together.'
 	},
 	{
 		title: 'Milestones',
-		body: 'New chapters, big birthdays, or simply because you have not had a good photo of yourself in years.'
+		body: 'First birthdays, graduations, new chapters, or simply because you have not had a good photo of yourself in years.'
+	},
+	{
+		title: 'Headshots and branding',
+		body: 'For LinkedIn, your company site or your own business. Clean, confident and current.'
 	}
-];
+]
 
 export const testimonials = [
 	{
@@ -172,6 +172,9 @@ export const testimonials = [
 
 export const sessionTypes = [
 	{ id: 'portrait', label: 'Portrait' },
+	{ id: 'maternity', label: 'Maternity' },
+	{ id: 'creative', label: 'Creative or themed' },
+	{ id: 'milestone', label: 'Milestone or birthday' },
 	{ id: 'headshot', label: 'Headshot or branding' },
 	{ id: 'senior', label: 'Senior' },
 	{ id: 'couple', label: 'Couple' },
