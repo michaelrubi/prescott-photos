@@ -18,7 +18,7 @@ function formatShutter(seconds: number) {
 
 async function readCapture(file: string): Promise<Capture> {
 	const exif = await exifr
-		.parse(file, { pick: ['FNumber', 'ExposureTime', 'ISO', 'FocalLength'] })
+		.parse(readFileSync(file), { pick: ['FNumber', 'ExposureTime', 'ISO', 'FocalLength'] })
 		.catch(() => undefined);
 	if (!exif) return {};
 	return {
