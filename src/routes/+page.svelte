@@ -15,6 +15,10 @@
 	<p class="mono">{site.region}</p>
 	<h1>{site.name}</h1>
 	<p class="mono">New site in progress</p>
+	<nav class="preview" aria-label="Preview pages">
+		<a href="/work">Portfolio</a>
+		<a href="/style">Style guide</a>
+	</nav>
 </main>
 
 <style>
@@ -25,6 +29,16 @@
 		gap: var(--space-3);
 		padding: var(--gutter);
 		text-align: center;
+	}
+
+	.preview {
+		display: flex;
+		justify-content: center;
+		gap: var(--space-4);
+	}
+	.preview a {
+		color: var(--color-accent);
+		text-underline-offset: 0.25em;
 	}
 
 	h1 {
