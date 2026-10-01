@@ -32,3 +32,15 @@ Old URLs from the previous site (`/portfolio`, `/pricing`, `/contact`) redirect 
 ## Mirror
 
 GitHub is the source of truth. A Forgejo pull mirror keeps a backup copy.
+
+## Photos
+
+Photos live in `photos/<category>/` (`portraits`, `couples`, `families`) as high-quality JPGs, about 2560px on the long edge. Each folder has a `photos.json` with alt text per file:
+
+```json
+{
+	"watson-lake-golden-hour.jpg": { "alt": "Woman in a white dress at sunset on the granite dells at Watson Lake" }
+}
+```
+
+At build time every photo is resized to several widths in AVIF and WebP (metadata, including GPS, is stripped), given a tiny ThumbHash blur placeholder, and its lens, aperture, shutter and ISO are read for the captions. The `sample-*.jpg` files are generated placeholders (`node scripts/make-sample-photos.js`); delete them once real photos are in.
