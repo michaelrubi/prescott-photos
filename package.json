@@ -10,9 +10,12 @@
 		"dev": "vite dev",
 		"build": "vite build",
 		"preview": "vite preview",
-		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json"
+		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+		"test:rules": "firebase emulators:exec --only firestore --project demo-proofing 'node --test tests/*.test.js'",
+		"dev:proofing": "firebase emulators:exec --only firestore,auth --project demo-proofing --ui 'VITE_FIREBASE_EMULATORS=true vite dev'"
 	},
 	"devDependencies": {
+		"@firebase/rules-unit-testing": "^5.0.2",
 		"@sveltejs/adapter-static": "^4.0.0-next.4",
 		"@sveltejs/enhanced-img": "1.0.0-next.5",
 		"@sveltejs/kit": "^3.0.0-next.31",
@@ -29,6 +32,7 @@
 	"dependencies": {
 		"@fontsource-variable/geist": "^5.3.0",
 		"@fontsource-variable/geist-mono": "^5.3.0",
+		"firebase": "^12.19.0",
 		"gsap": "^3.15.0",
 		"photoswipe": "^5.4.4"
 	},

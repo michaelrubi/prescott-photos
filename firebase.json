@@ -1,4 +1,8 @@
 {
+	"firestore": {
+		"rules": "firestore.rules",
+		"indexes": "firestore.indexes.json"
+	},
 	"hosting": {
 		"public": "build",
 		"cleanUrls": true,
@@ -46,7 +50,27 @@
 						"value": "strict-origin-when-cross-origin"
 					}
 				]
+			},
+			{
+				"regex": "^/g(/.*)?$",
+				"headers": [
+					{
+						"key": "X-Robots-Tag",
+						"value": "noindex"
+					}
+				]
 			}
 		]
+	},
+	"emulators": {
+		"firestore": {
+			"port": 8080
+		},
+		"auth": {
+			"port": 9099
+		},
+		"ui": {
+			"enabled": true
+		}
 	}
 }

@@ -1,0 +1,64 @@
+rules_version = '2';
+
+// Proofing galleries (see src/lib/proofing/gallery.ts for the data model).
+// A gallery's random id is its key: anyone with the link can view it and
+// pick photos, nobody can list galleries, and only Michael can change them.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Google accounts that can manage galleries on /g/admin
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email_verified == true
+        && request.auth.token.email in ['mrubi.studios@gmail.com', 'michael@rubiconetic.com'];
+    }
+
+    match /galleries/{gid} {
+      allow get: if true;
+      allow list, write: if isAdmin();
+
+      // Listing a gallery's photos needs its id; collection group queries
+      // across galleries aren't allowed by these rules.
+      match /photos/{pid} {
+        allow read: if true;
+        allow write: if isAdmin();
+      }
+
+      match /full/{pid} {
+        allow get: if true;
+        allow list, write: if isAdmin();
+      }
+    }
+
+    match /picks/{gid} {
+      allow get: if true;
+      allow list, delete: if isAdmin();
+      allow create, update: if isAdmin() || clientCanPick(gid);
+    }
+
+    // A client may save picks while the gallery is open and until they
+    // submit; submitting locks them until Michael reopens them.
+    function clientCanPick(gid) {
+      let path = /databases/$(database)/documents/galleries/$(gid);
+      let data = request.resource.data;
+      return exists(path)
+        && pickRulesHold(get(path).data, data)
+        && (resource == null || resource.data.submitted == false);
+    }
+
+    function pickRulesHold(gallery, data) {
+      let limit = gallery.extraPrice > 0 ? gallery.photoCount : gallery.included;
+      return gallery.open == true
+        && data.keys().hasAll(['ids', 'note', 'submitted', 'updatedAt'])
+        && data.keys().hasOnly(['ids', 'note', 'submitted', 'updatedAt', 'submittedAt'])
+        && data.ids is list
+        && data.ids.size() <= limit
+        && data.note is string
+        && data.note.size() <= 2000
+        && data.submitted is bool
+        && data.updatedAt == request.time
+        && (data.submitted
+          ? data.ids.size() > 0 && data.submittedAt == request.time
+          : !('submittedAt' in data));
+    }
+  }
+}
