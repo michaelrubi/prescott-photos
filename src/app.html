@@ -5,6 +5,12 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="color-scheme" content="dark light" />
 		<link rel="icon" href="%sveltekit.assets%/favicon.svg" type="image/svg+xml" />
+		<script>
+			// Lets CSS hold intro animations in their start state before first paint
+			if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+				document.documentElement.classList.add('motion');
+			}
+		</script>
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover">

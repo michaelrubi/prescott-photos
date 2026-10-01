@@ -6,17 +6,82 @@
 	import { onMount } from 'svelte';
 	import { pictures, type PhotoMeta } from '#lib/photos.ts';
 	import { openViewer, type ViewerHandle } from '#lib/viewer.ts';
+	import { loadMotion, reducedMotion, type Motion } from '#lib/motion/gsap.ts';
 
 	let { photos }: { photos: PhotoMeta[] } = $props();
 
 	let grid: HTMLElement;
 	let viewer: ViewerHandle | undefined;
+	let motion: Motion | undefined;
+	let flipState: ReturnType<Motion['Flip']['getState']> | undefined;
+	let watchNewItems: (() => void) | undefined;
 
 	const largest = (photo: PhotoMeta) => pictures[photo.path].img.src;
+	const items = () => Array.from(grid.querySelectorAll<HTMLElement>('.item'));
 
 	onMount(() => {
 		viewer = openViewer(grid, () => photos);
-		return () => viewer?.destroy();
+		let ctx: gsap.Context | undefined;
+
+		if (!reducedMotion()) {
+			loadMotion().then((m) => {
+				motion = m;
+				const { gsap, ScrollTrigger } = m;
+				ctx = gsap.context(() => {
+					// "Focus pull": each photo starts soft, desaturated and slightly
+					// cropped, then snaps sharp as it scrolls into view.
+					const develop = (batch: Element[]) =>
+						gsap.to(batch, {
+							'--focus': 0,
+							clipPath: 'inset(0% 0% 0% 0%)',
+							duration: 1.1,
+							ease: 'expo.out',
+							stagger: 0.08,
+							overwrite: true
+						});
+					watchNewItems = () => {
+						const fresh = items().filter((el) => !el.dataset.watched);
+						fresh.forEach((el) => (el.dataset.watched = '1'));
+						gsap.set(fresh, { '--focus': 1, clipPath: 'inset(6% 6% 6% 6%)' });
+						ScrollTrigger.batch(fresh, { onEnter: develop, start: 'top 92%', once: true });
+					};
+					watchNewItems();
+				}, grid);
+			});
+		}
+
+		return () => {
+			ctx?.revert();
+			viewer?.destroy();
+		};
+	});
+
+	// When the filter changes, remember where every photo was before the DOM
+	// updates, then let GSAP Flip glide them to their new places.
+	$effect.pre(() => {
+		void photos;
+		if (motion && grid) flipState = motion.Flip.getState(items());
+	});
+	$effect(() => {
+		void photos;
+		if (!motion || !flipState) return;
+		const state = flipState;
+		flipState = undefined;
+		motion.Flip.from(state, {
+			targets: items(),
+			duration: 0.7,
+			ease: 'expo.inOut',
+			stagger: 0.015,
+			absolute: true,
+			onEnter: (els) =>
+				motion!.gsap.fromTo(
+					els,
+					{ autoAlpha: 0, scale: 0.94, '--focus': 1 },
+					{ autoAlpha: 1, scale: 1, '--focus': 0, clipPath: 'inset(0% 0% 0% 0%)', duration: 0.6, delay: 0.25, ease: 'power3.out' }
+				)
+		});
+		items().forEach((el) => (el.dataset.watched = '1'));
+		motion.ScrollTrigger.refresh();
 	});
 
 	function open(event: MouseEvent, index: number) {
@@ -31,6 +96,7 @@
 		{@const ratio = photo.width / photo.height}
 		<a
 			class="item"
+			data-af
 			href={largest(photo)}
 			id={photo.slug}
 			style:--ratio={ratio}
@@ -81,10 +147,15 @@
 		background-size: cover;
 		outline: none;
 	}
+	.item {
+		--focus: 0;
+	}
 	.item :global(img) {
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
+		filter: blur(calc(var(--focus) * 14px)) saturate(calc(1 - var(--focus) * 0.7));
+		transform: scale(calc(1 + var(--focus) * 0.06));
 		transition: transform var(--duration-base) var(--ease-focus);
 	}
 	.item:hover :global(img) {
@@ -116,7 +187,7 @@
 		transition: opacity var(--duration-base) var(--ease-focus);
 	}
 
-	.item:hover .bracket,
+	:global(html:not(.has-af)) .item:hover .bracket,
 	.item:focus-visible .bracket {
 		opacity: 1;
 		transform: none;

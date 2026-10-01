@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import FrameHud from '#lib/components/FrameHud.svelte';
 	import Gallery from '#lib/components/Gallery.svelte';
 	import SiteHeader from '#lib/components/SiteHeader.svelte';
 	import { categories, type Category } from '#lib/photos.ts';
@@ -62,6 +63,8 @@
 
 	<Gallery photos={shown} />
 </main>
+
+<FrameHud selector=".grid .item" total={shown.length} />
 
 <script lang="ts" module>
 	function pad(n: number) {
