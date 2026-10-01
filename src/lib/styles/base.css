@@ -77,3 +77,26 @@ a {
 ::view-transition-group(site-header) {
 	animation: none;
 }
+
+/* Long-form text such as the legal pages */
+.prose {
+	max-width: 68ch;
+	padding-bottom: var(--space-7);
+	color: var(--color-text-muted);
+}
+.prose h2 {
+	margin: var(--space-5) 0 var(--space-2);
+	font-size: var(--text-lg);
+	font-weight: 600;
+	letter-spacing: -0.02em;
+	color: var(--color-text);
+}
+.prose p,
+.prose ul {
+	margin: 0 0 var(--space-3);
+}
+.prose a {
+	color: var(--color-text);
+	text-decoration-color: var(--color-accent);
+	text-underline-offset: 0.2em;
+}

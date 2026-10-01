@@ -7,18 +7,7 @@ export default defineConfig({
 	plugins: [
 		enhancedImages(),
 		sveltekit({
-			adapter: adapter({ strict: true }),
-			prerender: {
-				// Pages from the plan that aren't built yet are linked from the
-				// header; warn instead of failing until they exist.
-				handleHttpError: ({ status, path, referrer, message }) => {
-					if (status === 404) {
-						console.warn(`404 ${path} (linked from ${referrer})`);
-						return;
-					}
-					throw new Error(message);
-				}
-			}
+			adapter: adapter({ strict: true })
 		})
 	]
 });

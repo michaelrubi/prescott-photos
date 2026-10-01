@@ -10,7 +10,9 @@
 		"dev": "vite dev",
 		"build": "vite build",
 		"preview": "vite preview",
-		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json"
+		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+		"functions:install": "pnpm --dir functions install",
+		"deploy:functions": "pnpm functions:install && pnpm --config.engine-strict=false dlx firebase-tools deploy --only functions"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-static": "^4.0.0-next.4",
