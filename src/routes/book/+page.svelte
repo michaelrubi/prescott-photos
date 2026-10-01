@@ -14,6 +14,12 @@
 	let sentHeading = $state<HTMLElement>();
 
 	const sources = ['Instagram', 'Facebook', 'Google', 'A friend', 'Somewhere else'];
+	const times = ['Sunrise', 'Morning', 'Golden hour', 'Any time'];
+	const maxDates = 3;
+
+	let dates = $state(['']);
+	let time = $state('Any time');
+	let minDate = $state('');
 
 	// Links like /book?type=senior or /book?package=signature pre-fill the form
 	onMount(() => {
@@ -22,6 +28,11 @@
 		const p = params.get('package');
 		if (sessionTypes.some((s) => s.id === t)) type = t!;
 		if (packages.some((x) => x.id === p)) pkg = p!;
+
+		// Earliest pickable date is tomorrow, in the visitor's time zone
+		const tomorrow = new Date();
+		tomorrow.setDate(tomorrow.getDate() + 1);
+		minDate = tomorrow.toLocaleDateString('en-CA');
 	});
 
 	async function submit(event: SubmitEvent) {
@@ -43,7 +54,15 @@
 			// CORS preflight; n8n still parses the fields into the webhook body.
 			const response = await fetch(site.inquiryWebhook, {
 				method: 'POST',
-				body: new URLSearchParams({ ...data, type: typeLabel, page: location.href, sentAt: new Date().toISOString() })
+				body: new URLSearchParams({
+					...data,
+					type: typeLabel,
+					// ISO dates (YYYY-MM-DD), earliest first, so n8n can use them without parsing
+					dates: [...new Set(dates.filter(Boolean))].sort().join(', '),
+					time,
+					page: location.href,
+					sentAt: new Date().toISOString()
+				})
 			});
 			if (!response.ok) throw new Error(`Webhook responded ${response.status}`);
 			firstName = data.name.trim().split(/\s+/)[0];
@@ -108,11 +127,40 @@
 						</select>
 					</label>
 				</div>
+				<fieldset>
+					<legend>Preferred dates <em>(optional, up to {maxDates})</em></legend>
+					<div class="dates">
+						{#each dates as _, i (i)}
+							<div class="date">
+								<input type="date" min={minDate} bind:value={dates[i]} aria-label="Preferred date {i + 1}" />
+								{#if dates.length > 1}
+									<button
+										type="button"
+										class="remove"
+										aria-label="Remove date {i + 1}"
+										onclick={() => dates.splice(i, 1)}>×</button
+									>
+								{/if}
+							</div>
+						{/each}
+						{#if dates.length < maxDates}
+							<button type="button" class="add" onclick={() => dates.push('')}>+ Add another date</button>
+						{/if}
+					</div>
+				</fieldset>
+				<fieldset>
+					<legend>Time of day</legend>
+					<div class="chips">
+						{#each times as t (t)}
+							<label class="chip">
+								<input type="radio" name="time" value={t} bind:group={time} />
+								<span>{t}</span>
+							</label>
+						{/each}
+					</div>
+					<p class="hint">Golden hour, the hour before sunset, is the most flattering light for portraits.</p>
+				</fieldset>
 				<div class="row">
-					<label>
-						<span>Dates that work <em>(optional)</em></span>
-						<input name="dates" placeholder="e.g. weekends in late October" />
-					</label>
 					<label>
 						<span>How did you find me? <em>(optional)</em></span>
 						<select name="source">
@@ -230,6 +278,108 @@
 	}
 	textarea {
 		resize: vertical;
+	}
+	input[type='date'] {
+		color-scheme: dark;
+	}
+	fieldset {
+		display: grid;
+		gap: var(--space-2);
+		margin: 0;
+		padding: 0;
+		border: 0;
+		min-width: 0;
+	}
+	legend {
+		padding: 0;
+		margin-bottom: var(--space-2);
+		font-family: var(--font-mono);
+		font-size: var(--text-xs);
+		letter-spacing: var(--tracking-mono);
+		text-transform: uppercase;
+		color: var(--color-text-muted);
+	}
+	legend em {
+		font-style: normal;
+		opacity: 0.6;
+		text-transform: none;
+	}
+	.dates {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+		gap: var(--space-2) var(--space-4);
+		align-items: end;
+	}
+	.date {
+		display: flex;
+		align-items: center;
+		gap: var(--space-2);
+	}
+	.remove,
+	.add {
+		border: 0;
+		background: none;
+		color: var(--color-text-muted);
+		font: inherit;
+		cursor: pointer;
+	}
+	.remove {
+		font-size: var(--text-lg);
+		line-height: 1;
+	}
+	.add {
+		justify-self: start;
+		padding: 0.8em 0;
+		font-size: var(--text-sm);
+	}
+	.remove:hover,
+	.add:hover {
+		color: var(--color-accent);
+	}
+	.chips {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--space-2);
+	}
+	.chip {
+		position: relative;
+		display: inline-flex;
+		cursor: pointer;
+	}
+	.chip input {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		margin: 0;
+		opacity: 0;
+		pointer-events: none;
+	}
+	.chip span {
+		padding: 0.55em 1em;
+		border: 1px solid var(--color-line);
+		border-radius: 999px;
+		font-size: var(--text-sm);
+		color: var(--color-text-muted);
+		transition:
+			border-color var(--duration-fast),
+			color var(--duration-fast);
+	}
+	.chip:hover span {
+		color: var(--color-text);
+	}
+	.chip input:checked + span {
+		border-color: var(--color-accent);
+		color: var(--color-text);
+	}
+	.chip input:focus-visible + span {
+		outline: 2px solid var(--color-focus);
+		outline-offset: 2px;
+	}
+	.hint {
+		margin: 0;
+		font-size: var(--text-sm);
+		color: var(--color-text-muted);
 	}
 	input::placeholder,
 	textarea::placeholder {
