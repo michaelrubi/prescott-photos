@@ -104,7 +104,7 @@
 
 <Seo
 	title="Michael Rubi Photography | Portraits in Prescott, Arizona"
-	description="Modern portrait photography in Prescott, Arizona. Relaxed, guided sessions for headshots, personal branding, seniors, couples and families."
+	description="Modern portrait photography in Prescott, Arizona. Relaxed, guided sessions for maternity, creative portraits, milestones, headshots and couples."
 	image={data.heroShare}
 	jsonld={[business(data.heroShare), person]}
 />
@@ -117,6 +117,7 @@
 			<enhanced:img
 				src={pictures[data.hero.path]}
 				alt={data.hero.alt}
+				style={data.hero.focus && `object-position: ${data.hero.focus}`}
 				sizes="100vw"
 				fetchpriority="high"
 			/>
@@ -191,7 +192,13 @@
 				{@const photo = data.feel[i]}
 				<li>
 					<div class="feel-photo" style:background-image="url({photo.placeholder})">
-						<enhanced:img src={pictures[photo.path]} alt={photo.alt} sizes="(min-width: 48rem) 30vw, 90vw" loading="lazy" />
+						<enhanced:img
+							src={pictures[photo.path]}
+							alt={photo.alt}
+							style={photo.focus && `object-position: ${photo.focus}`}
+							sizes="(min-width: 48rem) 30vw, 90vw"
+							loading="lazy"
+						/>
 					</div>
 					<span class="mono">{pad(i + 1)}</span>
 					<h3>{point.title}</h3>
@@ -237,7 +244,9 @@
 		background-size: cover;
 		background-position: center;
 	}
+	.hero-image :global(picture),
 	.hero-image :global(img) {
+		display: block;
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
@@ -326,7 +335,8 @@
 	}
 	h1 {
 		margin: 0;
-		font-size: var(--text-display);
+		/* A little smaller than other pages so the photo stays the star */
+		font-size: clamp(3rem, 1.5rem + 5vw, 6rem);
 		line-height: 0.92;
 		letter-spacing: var(--tracking-tight);
 		font-weight: 600;
@@ -471,6 +481,10 @@
 		background-size: cover;
 		overflow: hidden;
 	}
+	.reel-frame :global(picture) {
+		display: block;
+		height: 100%;
+	}
 	.reel-frame :global(img) {
 		width: 100%;
 		height: 100%;
@@ -554,7 +568,9 @@
 		overflow: hidden;
 		background-size: cover;
 	}
+	.feel-photo :global(picture),
 	.feel-photo :global(img) {
+		display: block;
 		width: 100%;
 		height: 100%;
 		object-fit: cover;

@@ -4,8 +4,9 @@ import { shareImages } from '#lib/photos.ts';
 export async function load() {
 	const photos = await loadPhotos();
 	const portraits = photos.filter((p) => p.category === 'portraits');
-	const hero = portraits[0] ?? photos[0];
+	const hero = photos.find((p) => p.hero) ?? portraits[0] ?? photos[0];
+	const rest = portraits.filter((p) => p !== hero);
 	// One photo beside each "how it feels" point, picked from across the reel
-	const feel = [2, 4, 6].map((i) => portraits[i % portraits.length] ?? hero);
-	return { hero, reel: portraits.slice(1, 9), feel, heroShare: shareImages[hero.path] };
+	const feel = [1, 3, 5].map((i) => rest[i % rest.length] ?? hero);
+	return { hero, reel: rest.slice(0, 8), feel, heroShare: shareImages[hero.path] };
 }

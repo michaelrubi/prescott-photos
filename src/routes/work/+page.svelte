@@ -10,9 +10,10 @@
 	let active = $state<Category | 'all'>('all');
 	const shown = $derived(active === 'all' ? data.photos : data.photos.filter((p) => p.category === active));
 
-	const filters = [{ id: 'all', label: 'All' } as const, ...categories];
 	const count = (id: string) =>
 		id === 'all' ? data.photos.length : data.photos.filter((p) => p.category === id).length;
+	// Categories without photos yet stay out of the filter
+	const filters = [{ id: 'all', label: 'All' } as const, ...categories.filter((c) => count(c.id) > 0)];
 
 	// The filter lives in ?category= so a filtered view can be linked to
 	onMount(() => {

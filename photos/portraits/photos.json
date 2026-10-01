@@ -1,35 +1,37 @@
 {
+	"MJR00444.jpg": {
+		"alt": "Woman in a celestial black gown looking into a round mirror on a tree stump in autumn woods",
+		"hero": true,
+		"focus": "48% 50%"
+	},
 	"MJR-31.jpg": {
 		"alt": "Expectant mother in an emerald green gown resting on red rock formations at dusk"
-	},
-	"MJR00309.jpg": {
-		"alt": "Woman in a flowing star-patterned black tulle gown backlit by golden hour sunlight"
-	},
-	"MJR00444.jpg": {
-		"alt": "Woman in a celestial black gown looking into a round mirror on a tree stump in autumn woods"
-	},
-	"MJR00543.jpg": {
-		"alt": "Close-up portrait of a woman holding purple fairy lights with glowing purple bokeh"
-	},
-	"MJR03105.jpg": {
-		"alt": "Baby girl celebrating first birthday with a glitter crown and cake with frosting on her face"
-	},
-	"MJR05118.jpg": {
-		"alt": "Woman standing on a rustic wooden dock at sunset overlooking a peaceful lake"
 	},
 	"MJR07834.jpg": {
 		"alt": "Studio maternity portrait of an expectant mother in a mauve tulle dress cradling her baby bump"
 	},
-	"MJR09397.jpg": {
-		"alt": "Three women in gothic black attire posing in the woods with carved jack-o'-lanterns"
-	},
 	"MJR09481.jpg": {
 		"alt": "Artistic portrait of a woman in an olive dress illuminated with projected green botanical lighting"
+	},
+	"MRP-16.jpg": {
+		"alt": "Sunset silhouette of an expectant mother against desert mountains and evening sky"
+	},
+	"MJR05118.jpg": {
+		"alt": "Woman standing on a rustic wooden dock at sunset overlooking a peaceful lake"
+	},
+	"MJR00543.jpg": {
+		"alt": "Close-up portrait of a woman holding purple fairy lights with glowing purple bokeh"
+	},
+	"MJR00309.jpg": {
+		"alt": "Woman in a flowing star-patterned black tulle gown backlit by golden hour sunlight"
 	},
 	"MJR09665.jpg": {
 		"alt": "Person in autumn woods wearing a carved jack-o'-lantern on their head with smoke billowing out"
 	},
-	"MRP-16.jpg": {
-		"alt": "Sunset silhouette of an expectant mother against desert mountains and evening sky"
+	"MJR03105.jpg": {
+		"alt": "Baby girl celebrating first birthday with a glitter crown and cake with frosting on her face"
+	},
+	"MJR09397.jpg": {
+		"alt": "Three women in gothic black attire posing in the woods with carved jack-o'-lanterns"
 	}
 }
