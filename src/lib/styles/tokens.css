@@ -11,8 +11,8 @@
 	--color-focus: var(--color-accent);
 
 	/* Type */
-	--font-sans: 'Geist', 'Inter Tight', system-ui, sans-serif;
-	--font-mono: 'Geist Mono', ui-monospace, 'SF Mono', monospace;
+	--font-sans: 'Geist Variable', system-ui, sans-serif;
+	--font-mono: 'Geist Mono Variable', ui-monospace, 'SF Mono', monospace;
 	--text-xs: 0.75rem;
 	--text-sm: 0.875rem;
 	--text-base: 1rem;
