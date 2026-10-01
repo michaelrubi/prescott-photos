@@ -9,7 +9,7 @@ service cloud.firestore {
     function isAdmin() {
       return request.auth != null
         && request.auth.token.email_verified == true
-        && request.auth.token.email in ['mrubi.studios@gmail.com', 'michael@rubiconetic.com'];
+        && request.auth.token.email in ['mr.arubei@gmail.com', 'mrubi.studios@gmail.com', 'michael@rubiconetic.com'];
     }
 
     match /galleries/{gid} {
