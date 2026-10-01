@@ -57,6 +57,9 @@ export const packages: Package[] = [
 
 export const startingPrice = Math.min(...packages.map((p) => p.price));
 
+/** Holds a session date and comes off the package total */
+export const retainer = 100;
+
 export const addOns = [
 	{ name: 'Prints', detail: 'Lab-printed on archival paper, from wallet size up to 16×24.' },
 	{ name: 'Albums', detail: 'Lay-flat albums designed around your favorite images.' },
@@ -91,7 +94,7 @@ export interface Faq {
 export const sessionFaqs: Faq[] = [
 	{
 		q: 'How do I reserve a date?',
-		a: 'A $100 retainer holds your date and comes off your package total. The rest is due after your session, before your gallery is delivered.'
+		a: 'A $100 retainer, paid online by card, holds your date and comes off your package total. The rest is due after your session, before your gallery is delivered. You can also pay in full up front.'
 	},
 	{
 		q: 'Where do sessions take place?',

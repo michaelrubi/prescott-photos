@@ -11,6 +11,14 @@
 	import Seo from '#lib/components/Seo.svelte';
 	import type { Gallery, ProofPhoto } from '#lib/proofing/gallery.ts';
 	import { lightroomList } from '#lib/proofing/lightroom.ts';
+	import {
+		paymentsEnabled,
+		quoteExtras,
+		returnUrl,
+		startCheckout,
+		takeReturnState,
+		type ExtrasQuote
+	} from '#lib/payments.ts';
 	import type { proofViewer } from '#lib/proofing/viewer.ts';
 	import { site } from '#lib/site.ts';
 
@@ -28,6 +36,10 @@
 	let toast = $state('');
 	let submitError = $state('');
 	let sending = $state(false);
+	let quote = $state<ExtrasQuote>();
+	let returned = $state<'paid' | 'canceled'>();
+	let paying = $state(false);
+	let payError = $state('');
 	let grid = $state<HTMLElement>();
 	let dialog = $state<HTMLDialogElement>();
 
@@ -43,6 +55,11 @@
 	const extras = $derived(Math.max(0, picked.size - included));
 	const extraTotal = $derived(extras * (gallery?.extraPrice ?? 0));
 	const money = (n: number) => `$${n.toLocaleString('en-US')}`;
+	// Extras are paid by card once picks are sent. The quote comes from n8n
+	// (what Stripe has received); until it arrives, assume nothing is paid.
+	const payable = $derived(paymentsEnabled && submitted && extraTotal > 0);
+	const due = $derived(quote?.due ?? extraTotal);
+	const extrasPaid = $derived(returned === 'paid' || (quote !== undefined && quote.due <= 0));
 
 	onMount(() => {
 		load();
@@ -56,6 +73,7 @@
 
 	async function load() {
 		gid = location.hash.slice(1);
+		returned = takeReturnState();
 		if (!/^[A-Za-z0-9]{20}$/.test(gid)) {
 			view = 'missing';
 			return;
@@ -83,6 +101,7 @@
 			submitted = picks.submitted;
 			full = api.fullImages(db, gid);
 			view = 'ready';
+			refreshQuote();
 
 			await tick();
 			const { proofViewer } = await import('#lib/proofing/viewer.ts');
@@ -161,6 +180,7 @@
 			dialog?.close();
 			viewer?.refresh();
 			notify(gallery);
+			refreshQuote();
 		} catch (error) {
 			console.error(error);
 			submitError =
@@ -192,6 +212,36 @@
 				sentAt: new Date().toISOString()
 			})
 		}).catch((error) => console.error(error));
+	}
+
+	function refreshQuote() {
+		if (!payable) return;
+		quoteExtras(gid).then(
+			(q) => (quote = q),
+			(error) => console.error('Quote failed:', error)
+		);
+	}
+
+	async function payExtras() {
+		if (paying) return;
+		paying = true;
+		payError = '';
+		try {
+			const { paid } = await startCheckout({
+				kind: 'extras',
+				gallery: gid,
+				success: returnUrl('paid'),
+				cancel: returnUrl('canceled')
+			});
+			if (paid) {
+				quote = { total: extraTotal, paid: extraTotal, due: 0 };
+				paying = false;
+			}
+		} catch (error) {
+			console.error('Checkout failed:', error);
+			payError = "Checkout didn't open. Please try again in a minute, or ask Michael for an invoice.";
+			paying = false;
+		}
 	}
 
 	function openViewer(index: number) {
@@ -232,6 +282,24 @@
 					Thank you{gallery.client ? `, ${gallery.client}` : ''}! Your {picked.size} picks are with Michael. If you'd like to
 					change something, let him know and he'll reopen the gallery.
 				</p>
+				{#if payable}
+					<div class="pay" aria-live="polite">
+						{#if extrasPaid}
+							<p><strong>Extras paid.</strong> Thank you! Your receipt is on its way to your inbox.</p>
+						{:else}
+							<p>
+								Your {extras} extra image{extras === 1 ? '' : 's'} come{extras === 1 ? 's' : ''} to
+								<strong>{money(due)}</strong>{#if quote && quote.paid > 0}
+									after the {money(quote.paid)} you've already paid{/if}.
+								{#if returned === 'canceled'}Checkout was cancelled, so nothing was charged.{/if}
+							</p>
+							<button class="send" type="button" disabled={paying} onclick={payExtras}>
+								{paying ? 'Opening checkout…' : `Pay ${money(due)} by card`}
+							</button>
+							{#if payError}<p class="error" role="alert">{payError}</p>{/if}
+						{/if}
+					</div>
+				{/if}
 			{:else if !gallery.open}
 				<p class="notice">This gallery is closed for picking.</p>
 			{:else}
@@ -316,7 +384,9 @@
 					<p>
 						That's {included} included plus {extras} extra{extras === 1 ? '' : 's'} at {money(gallery.extraPrice)} each, {money(
 							extraTotal
-						)} in total. Michael will send an invoice for the extras.
+						)} in total. {paymentsEnabled
+							? "You can pay for the extras by card once they're sent."
+							: 'Michael will send an invoice for the extras.'}
 					</p>
 				{:else}
 					<p>That's your full package. Michael will start editing these.</p>
@@ -386,6 +456,16 @@
 		padding: var(--space-3);
 		border-left: 2px solid var(--color-accent);
 		background: var(--color-surface);
+		color: var(--color-text);
+	}
+	.pay {
+		display: grid;
+		justify-items: start;
+		gap: var(--space-3);
+		padding: var(--space-3);
+		border: 1px solid var(--color-line);
+	}
+	.pay strong {
 		color: var(--color-text);
 	}
 	.empty {
