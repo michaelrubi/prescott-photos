@@ -32,7 +32,7 @@ Old URLs from the previous site (`/portfolio`, `/pricing`, `/contact`) redirect 
 
 ### Booking form
 
-The Book page posts each inquiry as JSON straight from the browser to an n8n webhook, set as `inquiryWebhook` in `src/lib/site.ts`. Fields: `name`, `email`, `type`, `package`, `dates`, `source`, `message`, `page`, `sentAt`. Any `2xx` response counts as sent. In n8n, set the Webhook node to respond immediately and add this site's origins (prescottphotos.com and the `rubi-photo--*.web.app` preview URLs, or `*`) under **Allowed Origins (CORS)**.
+The Book page posts each inquiry as a URL-encoded form (no CORS preflight) straight from the browser to an n8n webhook, set as `inquiryWebhook` in `src/lib/site.ts`. Fields: `name`, `email`, `type`, `package`, `dates`, `source`, `message`, `page`, `sentAt`. Any `2xx` response counts as sent. In n8n, the workflow must be active (the production `/webhook/` URL only works then), the Webhook node set to POST and respond immediately, and **Allowed Origins (CORS)** left at `*` or set to this site's origins so the browser can read the response.
 
 Site copy that repeats across pages or changes often (packages, prices, policies, FAQs, locations) lives in `src/lib/content.ts`.
 
