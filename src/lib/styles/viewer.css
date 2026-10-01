@@ -40,3 +40,30 @@
 	color: var(--color-text, #ecebe8);
 	white-space: nowrap;
 }
+
+/* Proofing galleries: the heart that picks the open photo */
+.pswp__button--pick {
+	display: grid;
+	place-items: center;
+	width: 50px;
+	height: 60px;
+}
+.pswp__button--pick svg {
+	width: 26px;
+	height: 26px;
+	fill: transparent;
+	stroke: var(--pswp-icon-color);
+	stroke-width: 1.6;
+	transition:
+		fill 150ms,
+		stroke 150ms,
+		transform 150ms;
+}
+.pswp__button--pick.is-picked {
+	opacity: 1;
+}
+.pswp__button--pick.is-picked svg {
+	fill: var(--color-accent, #f2a35e);
+	stroke: var(--color-accent, #f2a35e);
+	transform: scale(1.08);
+}

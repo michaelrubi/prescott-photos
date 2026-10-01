@@ -51,3 +51,27 @@ Photos live in `photos/<category>/` (`portraits`, `couples`, `families`) as high
 ```
 
 At build time every photo is resized to several widths in AVIF and WebP (metadata, including GPS, is stripped), given a tiny ThumbHash blur placeholder, and its lens, aperture, shutter and ISO are read for the captions. The `sample-*.jpg` files are generated placeholders (`node scripts/make-sample-photos.js`); delete them once real photos are in.
+
+## Proofing galleries
+
+Private galleries where a client picks their favorite shots from a culled session, instead of Michael choosing for them.
+
+- **Client:** `prescottphotos.com/g#<gallery id>`. They heart photos (a counter tracks their package's image count), open any photo full screen (P picks it there), and send their picks with an optional note. Picks save as they go, so they can come back on another device. Sending locks the picks until Michael reopens them.
+- **Michael:** `prescottphotos.com/g/admin`, signed in with Google. Create a gallery (title, client name, images included, optional per-image price for extras, a note), drop in the culled exports, copy the link. Picks appear live, with buttons to copy the file names for Lightroom's filename filter.
+
+Everything runs in the browser against Firestore (`src/lib/proofing/`); there's no server code. Uploads are resized in the browser to a 1600px proof and a 640px thumbnail, with all metadata removed, and stored as bytes in Firestore documents, because Cloud Storage needs the pay-as-you-go plan. The free plan's 1 GB of Firestore storage holds roughly 30 galleries of 80 photos, so delete galleries after delivery.
+
+The gallery id (20 random characters, in the URL hash so it never reaches a server log) is the key: anyone with the link can view and pick. Nobody can list galleries, and only the Google accounts in `firestore.rules` can create or change them.
+
+When a client sends picks, the page posts them (URL-encoded, like the booking form) to `picksWebhook` in `src/lib/site.ts`, if set. Fields: `gallery`, `client`, `count`, `included`, `extras`, `extraTotal`, `note`, `files` (Lightroom list), `admin` (link to the gallery's admin page), `sentAt`.
+
+### One-time Firebase setup
+
+1. **Firestore:** Firebase console → Build → Firestore Database → Create database. Use the `(default)` database, Standard edition, a US location (`us-west2` is closest; it can't be changed later), and production mode.
+2. **Google sign-in:** Build → Authentication → Get started → Sign-in method → Google → Enable. Under Settings → Authorized domains, add `prescottphotos.com` (and the staging channel's domain to test there).
+3. **Web app:** Project settings → General → Your apps → Add app → Web, and link it to the Hosting site. The site reads its config from Hosting's `/__/firebase/init.json`, so nothing needs to be pasted into the code.
+4. **Rules and indexes:** from this repo, `firebase deploy --only firestore` (needs the Firebase CLI signed in to the project). CI deploys Hosting only.
+
+### Local development
+
+`pnpm dev:proofing` runs the site against local Firestore and Auth emulators (needs the Firebase CLI and Java 21+); the admin's sign-in button signs in as the studio account without Google. `pnpm test:rules` tests `firestore.rules` against the emulator. Plain `pnpm dev` uses the real project through the dev server's proxy.
