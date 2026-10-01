@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Button from '#lib/components/Button.svelte';
 	import Frame from '#lib/components/Frame.svelte';
-	import SiteHeader from '#lib/components/SiteHeader.svelte';
+	import Seo from '#lib/components/Seo.svelte';
 	import { reveal } from '#lib/motion/reveal.ts';
 
 	const colors = [
@@ -20,12 +20,8 @@
 	] as const;
 </script>
 
-<svelte:head>
-	<title>Style preview | Michael Rubi Photography</title>
-	<meta name="robots" content="noindex" />
-</svelte:head>
+<Seo title="Style preview | Michael Rubi Photography" description="Design system preview." noindex />
 
-<SiteHeader />
 
 <main>
 	<!-- Hero -->

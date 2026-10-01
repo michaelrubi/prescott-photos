@@ -6,6 +6,8 @@
 	import { onNavigate } from '$app/navigation';
 	import AfCursor from '#lib/components/AfCursor.svelte';
 	import Grain from '#lib/components/Grain.svelte';
+	import SiteFooter from '#lib/components/SiteFooter.svelte';
+	import SiteHeader from '#lib/components/SiteHeader.svelte';
 
 	let { children } = $props();
 
@@ -21,7 +23,11 @@
 	});
 </script>
 
+<SiteHeader />
+
 {@render children()}
+
+<SiteFooter />
 
 <AfCursor />
 <Grain />

@@ -2,9 +2,8 @@
 	import { onMount } from 'svelte';
 	import FrameHud from '#lib/components/FrameHud.svelte';
 	import Gallery from '#lib/components/Gallery.svelte';
-	import SiteHeader from '#lib/components/SiteHeader.svelte';
 	import { categories, type Category } from '#lib/photos.ts';
-	import { site } from '#lib/site.ts';
+	import Seo from '#lib/components/Seo.svelte';
 
 	let { data } = $props();
 
@@ -31,16 +30,11 @@
 	}
 </script>
 
-<svelte:head>
-	<title>Portfolio | Michael Rubi Photography, Prescott AZ</title>
-	<meta
-		name="description"
-		content="Portrait, couple and family photography by Michael Rubi in Prescott, Arizona."
-	/>
-	<link rel="canonical" href="{site.url}/work" />
-</svelte:head>
+<Seo
+	title="Portfolio | Michael Rubi Photography, Prescott AZ"
+	description="Portrait, couple and family photography by Michael Rubi in Prescott, Arizona. Browse the full portfolio."
+/>
 
-<SiteHeader />
 
 <main>
 	<header class="intro">

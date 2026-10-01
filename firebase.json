@@ -3,24 +3,73 @@
 		"public": "build",
 		"cleanUrls": true,
 		"trailingSlash": false,
-		"ignore": ["firebase.json", "**/.*"],
+		"ignore": [
+			"firebase.json",
+			"**/.*"
+		],
 		"redirects": [
-			{ "source": "/portfolio", "destination": "/work", "type": 301 },
-			{ "source": "/pricing", "destination": "/sessions", "type": 301 },
-			{ "source": "/contact", "destination": "/book", "type": 301 }
+			{
+				"source": "/portfolio",
+				"destination": "/work",
+				"type": 301
+			},
+			{
+				"source": "/pricing",
+				"destination": "/sessions",
+				"type": 301
+			},
+			{
+				"source": "/contact",
+				"destination": "/book",
+				"type": 301
+			}
 		],
 		"headers": [
 			{
 				"source": "/_app/immutable/**",
-				"headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+				"headers": [
+					{
+						"key": "Cache-Control",
+						"value": "public, max-age=31536000, immutable"
+					}
+				]
 			},
 			{
 				"source": "**",
 				"headers": [
-					{ "key": "X-Content-Type-Options", "value": "nosniff" },
-					{ "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
+					{
+						"key": "X-Content-Type-Options",
+						"value": "nosniff"
+					},
+					{
+						"key": "Referrer-Policy",
+						"value": "strict-origin-when-cross-origin"
+					}
 				]
 			}
+		],
+		"rewrites": [
+			{
+				"source": "/api/inquiry",
+				"function": {
+					"functionId": "inquiry",
+					"region": "us-central1"
+				}
+			}
 		]
-	}
+	},
+	"functions": [
+		{
+			"source": "functions",
+			"codebase": "default",
+			"runtime": "nodejs22",
+			"ignore": [
+				"node_modules",
+				".git",
+				"*.log",
+				"pnpm-lock.yaml",
+				"pnpm-workspace.yaml"
+			]
+		}
+	]
 }

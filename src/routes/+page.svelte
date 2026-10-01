@@ -1,10 +1,14 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import Button from '#lib/components/Button.svelte';
-	import SiteHeader from '#lib/components/SiteHeader.svelte';
+	import CallToBook from '#lib/components/CallToBook.svelte';
+	import Seo from '#lib/components/Seo.svelte';
+	import SectionHead from '#lib/components/SectionHead.svelte';
+	import { testimonials } from '#lib/content.ts';
+	import { reveal } from '#lib/motion/reveal.ts';
+	import { business, person } from '#lib/schema.ts';
 	import { pictures, type PhotoMeta } from '#lib/photos.ts';
 	import { loadMotion, reducedMotion } from '#lib/motion/gsap.ts';
-	import { site } from '#lib/site.ts';
 
 	let { data } = $props();
 
@@ -18,6 +22,21 @@
 		const { lens, aperture, shutter, iso } = p.capture;
 		return [lens, aperture, shutter, iso && `ISO ${iso}`].filter(Boolean).join(' · ');
 	};
+
+	const feel = [
+		{
+			title: 'You never have to guess',
+			body: "Most people don't know what to do with their hands. You won't need to: I guide every pose and angle, so you can stop thinking about the camera."
+		},
+		{
+			title: 'Light first, then location',
+			body: 'Prescott has granite, pines and a brick downtown. I pick the spot and the hour around the light that flatters you.'
+		},
+		{
+			title: 'Finished by hand',
+			body: 'Every image is edited one at a time, with careful retouching that still looks like you. Your gallery arrives online, ready to share.'
+		}
+	];
 
 	const words =
 		"I'm Michael, a portrait photographer in Prescott, Arizona. Fourteen years in the Air Force taught me to stay calm, read the room and wait for the real moment. That's what your session feels like.".split(
@@ -83,16 +102,13 @@
 	});
 </script>
 
-<svelte:head>
-	<title>Portrait Photographer in Prescott, AZ | Michael Rubi</title>
-	<meta
-		name="description"
-		content="Modern portrait photography in Prescott, Arizona by Michael Rubi. Relaxed, guided sessions for solo portraits, couples and families."
-	/>
-	<link rel="canonical" href={site.url} />
-</svelte:head>
+<Seo
+	title="Michael Rubi Photography | Portraits in Prescott, Arizona"
+	description="Modern portrait photography in Prescott, Arizona. Relaxed, guided sessions for headshots, personal branding, seniors, couples and families."
+	image={data.heroShare}
+	jsonld={[business(data.heroShare), person]}
+/>
 
-<SiteHeader />
 
 <main>
 	<!-- Hero: opens like a shutter, framed like a viewfinder -->
@@ -167,15 +183,39 @@
 		</div>
 	</section>
 
-	<!-- Closing call to book -->
-	<section class="closing">
-		<p class="mono label">03 · Your turn</p>
-		<h2>Ready when you are.</h2>
-		<p class="closing-copy">
-			Sessions are relaxed and guided, around Prescott and northern Arizona. Tell me what you have in mind.
-		</p>
-		<Button href="/book">Book a session</Button>
+	<!-- What a session feels like -->
+	<section class="feel">
+		<SectionHead label="03 · The session" title="Easy on you. Obsessive about the details." />
+		<ol class="feel-list" {@attach reveal({ stagger: 0.12 })}>
+			{#each feel as point, i (point.title)}
+				{@const photo = data.feel[i]}
+				<li>
+					<div class="feel-photo" style:background-image="url({photo.placeholder})">
+						<enhanced:img src={pictures[photo.path]} alt={photo.alt} sizes="(min-width: 48rem) 30vw, 90vw" loading="lazy" />
+					</div>
+					<span class="mono">{pad(i + 1)}</span>
+					<h3>{point.title}</h3>
+					<p>{point.body}</p>
+				</li>
+			{/each}
+		</ol>
+		<p class="feel-more"><a href="/sessions">How sessions and pricing work →</a></p>
 	</section>
+
+	<!-- Kind words -->
+	<section class="words-of-clients" aria-label="Client reviews">
+		<p class="mono label">04 · Kind words</p>
+		{#each testimonials as t (t.name)}
+			<figure {@attach reveal()}>
+				<blockquote>“{t.quote}”</blockquote>
+				<figcaption class="mono">{t.name}</figcaption>
+			</figure>
+		{/each}
+	</section>
+
+	<div class="closing">
+		<CallToBook label="05 · Your turn" />
+	</div>
 </main>
 
 <style>
@@ -487,27 +527,79 @@
 		}
 	}
 
-	/* ---------- Closing ---------- */
+	/* ---------- The session ---------- */
+	.feel,
+	.words-of-clients,
 	.closing {
 		max-width: var(--max-width);
 		margin: 0 auto;
-		padding: var(--space-7) var(--gutter);
+		padding: var(--space-7) var(--gutter) 0;
+	}
+	.feel-list {
 		display: grid;
-		justify-items: start;
-		gap: var(--space-4);
-		border-top: 1px solid var(--color-line);
-	}
-	.closing h2 {
+		grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+		gap: var(--space-5) var(--space-4);
 		margin: 0;
-		font-size: var(--text-display);
-		line-height: var(--leading-tight);
-		letter-spacing: var(--tracking-tight);
-		font-weight: 600;
+		padding: 0;
+		list-style: none;
 	}
-	.closing-copy {
+	.feel-list li {
+		display: grid;
+		align-content: start;
+		gap: var(--space-2);
+	}
+	.feel-photo {
+		aspect-ratio: 4 / 5;
+		margin-bottom: var(--space-2);
+		overflow: hidden;
+		background-size: cover;
+	}
+	.feel-photo :global(img) {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+	.feel-list .mono {
+		color: var(--color-accent);
+	}
+	.feel-list h3 {
 		margin: 0;
-		max-width: 44ch;
 		font-size: var(--text-lg);
+		font-weight: 600;
+		letter-spacing: -0.02em;
+	}
+	.feel-list p {
+		margin: 0;
 		color: var(--color-text-muted);
+	}
+	.feel-more {
+		margin: var(--space-5) 0 0;
+	}
+	.feel-more a {
+		text-decoration-color: var(--color-accent);
+		text-underline-offset: 0.3em;
+	}
+
+	/* ---------- Kind words ---------- */
+	.words-of-clients {
+		display: grid;
+		gap: var(--space-4);
+	}
+	.words-of-clients figure {
+		margin: 0;
+		display: grid;
+		gap: var(--space-4);
+	}
+	blockquote {
+		margin: 0;
+		max-width: 30ch;
+		font-size: clamp(1.5rem, 1rem + 2vw, 2.75rem);
+		line-height: 1.15;
+		letter-spacing: -0.03em;
+		font-weight: 500;
+	}
+	.words-of-clients figcaption::before {
+		content: '— ';
+		color: var(--color-accent);
 	}
 </style>

@@ -1,13 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/state';
+	import { nav } from '#lib/site.ts';
 	import Button from './Button.svelte';
-
-	const links = [
-		{ href: '/portraits', label: 'Portraits' },
-		{ href: '/work', label: 'Work' },
-		{ href: '/sessions', label: 'Sessions' },
-		{ href: '/about', label: 'About' }
-	];
 </script>
 
 <header>
@@ -20,7 +14,7 @@
 	</a>
 	<nav aria-label="Main">
 		<ul>
-			{#each links as link (link.href)}
+			{#each nav as link (link.href)}
 				<li>
 					<a href={link.href} aria-current={page.url.pathname === link.href ? 'page' : undefined}>
 						{link.label}
