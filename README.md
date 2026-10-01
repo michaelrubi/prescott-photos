@@ -36,6 +36,20 @@ The Book page posts each inquiry as a URL-encoded form (no CORS preflight) strai
 
 Site copy that repeats across pages or changes often (packages, prices, policies, FAQs, locations) lives in `src/lib/content.ts`.
 
+## Payments
+
+Clients pay by card through [Stripe Checkout](https://docs.stripe.com/payments/checkout). The site has no server, so the n8n **Stripe checkout** workflow (`checkoutWebhook` in `src/lib/site.ts`) holds the Stripe secret key. The browser only says what is being paid for; n8n works out the amount itself, creates a Checkout session and returns its URL (`src/lib/payments.ts`).
+
+- **Retainer and balance:** `prescottphotos.com/pay`. Send a client `/pay?package=signature&for=retainer` once their date is set, and `&for=balance` before delivery. Amounts come from `packages` and `retainer` in `src/lib/content.ts`, published as `/pay/prices.json` for n8n to read, so the page and the charge always match.
+- **Extra images:** once a client sends picks with more than their package includes, the gallery shows a "Pay by card" button for the extras. n8n counts the picks and reads the per-image price from Firestore, and subtracts anything Stripe already received for that gallery, so reopening a gallery and adding more only charges the difference.
+- **Prints** stay in the Pixieset store, not Stripe.
+
+The n8n **Stripe payment → email** workflow emails Michael when a checkout completes. Stripe emails the client a receipt (live mode: Stripe Dashboard → Settings → Customer emails → Successful payments).
+
+Requests to `checkoutWebhook` are URL-encoded form posts (no CORS preflight) with `action` (`checkout` or `quote`), `kind` (`retainer`, `balance` or `extras`), `package` or `gallery`, optional `name` and `email`, and the `success` and `cancel` pages to return to (this site's origins only). `checkout` answers `{ url }`, or `{ total, paid, due }` when nothing is owed; `quote` answers `{ total, paid, due }` for a gallery's extras.
+
+To switch from test to live payments, put the live secret key in the n8n Stripe credential. Nothing in the site changes.
+
 ## Mirror
 
 GitHub is the source of truth. A Forgejo pull mirror keeps a backup copy.

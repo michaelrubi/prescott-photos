@@ -20,7 +20,13 @@ export const site = {
 	 * from a proofing gallery. Empty means no notification; picks still show
 	 * up on /g/admin.
 	 */
-	picksWebhook: 'https://n8n.rubiconetic.com/webhook/c125007b-d63c-49a8-859c-7518acab38c4'
+	picksWebhook: 'https://n8n.rubiconetic.com/webhook/c125007b-d63c-49a8-859c-7518acab38c4',
+	/**
+	 * n8n webhook (POST, URL-encoded) that prices a payment and opens a Stripe
+	 * Checkout session for it, so the Stripe secret key stays in n8n. Empty
+	 * hides online payment. See "Payments" in the README.
+	 */
+	checkoutWebhook: 'https://n8n.rubiconetic.com/webhook/c4593c16-ecbe-463f-a0ab-71f78ff3a0da'
 } as const;
 
 export const nav = [
