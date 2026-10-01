@@ -25,14 +25,7 @@ GitHub Actions (`.github/workflows/ci.yml`) type-checks and builds every push an
 - Pull requests deploy to a temporary Firebase preview channel and get a comment with the preview link.
 - Live deploys are manual until launch: run the CI workflow on `main` from the Actions tab ("Run workflow"). After launch this switches back to deploying every merge to `main`.
 
-One-time setup in the GitHub repo settings:
-
-| Kind | Name | Value |
-| --- | --- | --- |
-| Variable | `FIREBASE_PROJECT_ID` | The Firebase project id |
-| Secret | `FIREBASE_SERVICE_ACCOUNT` | JSON key for a service account with the Firebase Hosting Admin role |
-
-Running `pnpm dlx firebase-tools init hosting:github` creates the service account and secret for you. Until the variable is set, CI only builds.
+The Firebase project is `rubi-photo`. CI authenticates with the `FIREBASE_SERVICE_ACCOUNT_RUBI_PHOTO` repository secret, created by `firebase init hosting:github`.
 
 Old URLs from the previous site (`/portfolio`, `/pricing`, `/contact`) redirect in `firebase.json`.
 
