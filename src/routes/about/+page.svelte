@@ -43,8 +43,8 @@
 		</div>
 		<div class="copy" {@attach reveal({ stagger: 0.08 })}>
 			<p class="first">
-				I photograph people in and around Prescott, Arizona: headshots, personal branding, seniors, couples and
-				families. Mostly, I photograph people who would tell you they're not photogenic.
+				I photograph people in and around Prescott, Arizona: maternity, creative and themed portraits, milestones,
+				headshots and couples. Mostly, I photograph people who would tell you they're not photogenic.
 			</p>
 			<p>
 				Photography started for me during fourteen years in the United States Air Force, as a way to remember the
