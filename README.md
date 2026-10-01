@@ -23,6 +23,7 @@ Imports from `src/lib` use Node subpath imports: `import { site } from '#lib/sit
 GitHub Actions (`.github/workflows/ci.yml`) type-checks and builds every push and pull request.
 
 - Pull requests deploy to a temporary Firebase preview channel and get a comment with the preview link.
+- Every merge to `main` updates the `staging` preview channel, a stable URL for the latest build.
 - Live deploys are manual until launch: run the CI workflow on `main` from the Actions tab ("Run workflow"). After launch this switches back to deploying every merge to `main`.
 
 The Firebase project is `rubi-photo`. CI authenticates with the `FIREBASE_SERVICE_ACCOUNT_RUBI_PHOTO` repository secret, created by `firebase init hosting:github`.
