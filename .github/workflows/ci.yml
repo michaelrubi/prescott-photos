@@ -31,7 +31,7 @@ jobs:
           retention-days: 3
 
   preview:
-    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && vars.FIREBASE_PROJECT_ID != ''
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
     needs: build
     runs-on: ubuntu-latest
     permissions:
@@ -47,12 +47,12 @@ jobs:
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-          projectId: ${{ vars.FIREBASE_PROJECT_ID }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_RUBI_PHOTO }}
+          projectId: rubi-photo
           expires: 14d
 
   deploy:
-    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && vars.FIREBASE_PROJECT_ID != ''
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     needs: build
     runs-on: ubuntu-latest
     concurrency: production
@@ -65,6 +65,6 @@ jobs:
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-          projectId: ${{ vars.FIREBASE_PROJECT_ID }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_RUBI_PHOTO }}
+          projectId: rubi-photo
           channelId: live
