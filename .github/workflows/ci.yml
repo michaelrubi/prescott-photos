@@ -76,13 +76,18 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     concurrency: staging
+    # Shows the staging link on the repo's Environments panel.
+    environment:
+      name: staging
+      url: ${{ steps.deploy.outputs.details_url }}
     steps:
       - uses: actions/checkout@v5
       - uses: actions/download-artifact@v5
         with:
           name: build
           path: build
-      - uses: FirebaseExtended/action-hosting-deploy@v0
+      - id: deploy
+        uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_RUBI_PHOTO }}
