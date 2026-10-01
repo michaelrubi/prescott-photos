@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { page } from '$app/state';
 	import Button from './Button.svelte';
 
 	const links = [
@@ -20,7 +21,11 @@
 	<nav aria-label="Main">
 		<ul>
 			{#each links as link (link.href)}
-				<li><a href={link.href}>{link.label}</a></li>
+				<li>
+					<a href={link.href} aria-current={page.url.pathname === link.href ? 'page' : undefined}>
+						{link.label}
+					</a>
+				</li>
 			{/each}
 		</ul>
 	</nav>
@@ -38,6 +43,7 @@
 		padding: var(--space-3) var(--gutter);
 		background: color-mix(in oklab, var(--color-bg), transparent 15%);
 		backdrop-filter: blur(12px);
+		view-transition-name: site-header;
 		border-bottom: 1px solid var(--color-line);
 	}
 	.mark {
@@ -63,13 +69,30 @@
 		list-style: none;
 	}
 	nav a {
+		position: relative;
 		font-size: var(--text-sm);
 		color: var(--color-text-muted);
 		text-decoration: none;
 		transition: color var(--duration-fast);
 	}
-	nav a:hover {
+	nav a::after {
+		content: '';
+		position: absolute;
+		inset: auto 0 -0.35em 0;
+		height: 1px;
+		background: var(--color-accent);
+		transform: scaleX(0);
+		transform-origin: right;
+		transition: transform var(--duration-base) var(--ease-focus);
+	}
+	nav a:hover,
+	nav a[aria-current='page'] {
 		color: var(--color-text);
+	}
+	nav a:hover::after,
+	nav a[aria-current='page']::after {
+		transform: scaleX(1);
+		transform-origin: left;
 	}
 
 	@media (max-width: 40rem) {

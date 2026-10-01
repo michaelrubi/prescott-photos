@@ -52,3 +52,28 @@ a {
 	clip-path: inset(50%);
 	white-space: nowrap;
 }
+
+/* Page transitions: a quick defocus between pages */
+@media (prefers-reduced-motion: no-preference) {
+	::view-transition-old(root) {
+		animation: 220ms var(--ease-focus) both defocus-out;
+	}
+	::view-transition-new(root) {
+		animation: 360ms var(--ease-focus) 80ms both defocus-in;
+	}
+}
+@keyframes defocus-out {
+	to {
+		opacity: 0;
+		filter: blur(8px);
+	}
+}
+@keyframes defocus-in {
+	from {
+		opacity: 0;
+		filter: blur(8px);
+	}
+}
+::view-transition-group(site-header) {
+	animation: none;
+}
