@@ -23,7 +23,7 @@ Imports from `src/lib` use Node subpath imports: `import { site } from '#lib/sit
 GitHub Actions (`.github/workflows/ci.yml`) type-checks and builds every push and pull request.
 
 - Pull requests deploy to a temporary Firebase preview channel and get a comment with the preview link.
-- Merges to `main` deploy to the live site.
+- Live deploys are manual until launch: run the CI workflow on `main` from the Actions tab ("Run workflow"). After launch this switches back to deploying every merge to `main`.
 
 One-time setup in the GitHub repo settings:
 
