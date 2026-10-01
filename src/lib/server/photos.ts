@@ -14,6 +14,8 @@ interface SidecarEntry {
 	hero?: boolean;
 	/** CSS object-position for crops, e.g. "60% 40%" to keep the subject in frame */
 	focus?: string;
+	/** Camera settings for photos whose EXIF was stripped; each field overrides EXIF */
+	capture?: Capture;
 }
 
 function formatShutter(seconds: number) {
@@ -75,7 +77,7 @@ export function loadPhotos(): Promise<PhotoMeta[]> {
 					focus: sidecar[name]?.focus,
 					width: rotated ? height : width,
 					height: rotated ? width : height,
-					capture: await readCapture(file),
+					capture: { ...(await readCapture(file)), ...sidecar[name]?.capture },
 					placeholder: await placeholder(file)
 				});
 			}
