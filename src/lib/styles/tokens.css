@@ -9,6 +9,7 @@
 	--color-accent: #f2a35e; /* Arizona sunset amber */
 	--color-accent-text: #0b0b0c;
 	--color-focus: var(--color-accent);
+	--color-logo-butte: #3a332d; /* warm charcoal, keeps the logo's lens a full circle on dark */
 
 	/* Type */
 	--font-sans: 'Geist Variable', system-ui, sans-serif;
@@ -49,6 +50,7 @@
 	--color-text-muted: #5f5d59;
 	--color-accent: #b5602a;
 	--color-accent-text: #ffffff;
+	--color-logo-butte: #141416;
 }
 
 @media (prefers-reduced-motion: reduce) {

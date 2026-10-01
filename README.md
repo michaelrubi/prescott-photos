@@ -50,6 +50,19 @@ Requests to `checkoutWebhook` are URL-encoded form posts (no CORS preflight) wit
 
 To switch from test to live payments, put the live secret key in the n8n Stripe credential. Nothing in the site changes.
 
+## Logo
+
+The logo is Thumb Butte as seen looking west down Gurley Street, against a sunset sky inside the site's AF corner brackets. `brand/` holds the finished files: the mark (dark, light, black and white), lockups and stacked versions for both "Michael Rubi" and "Prescott Photos", and the favicon. They are plain filled paths, so they open the same in Figma, Canva, Lightroom or a print shop.
+
+`brand/generator/build.py` makes all of them from `brand/generator/skyline.txt`, the butte's outline traced from a photo, and also writes `static/favicon.svg` and `src/lib/brand/mark.ts` (the paths `Logo.svelte` draws). To change the logo, edit the generator and run it from the repo root:
+
+```sh
+python3 -m pip install fonttools brotli uharfbuzz skia-pathops
+python3 brand/generator/build.py
+```
+
+The name next to the logo in the header is `brand` in `src/lib/site.ts`. `static/apple-touch-icon.png` is a 180px render of `brand/icon.svg`; re-export it if the icon changes.
+
 ## Mirror
 
 GitHub is the source of truth. A Forgejo pull mirror keeps a backup copy.
