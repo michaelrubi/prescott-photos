@@ -94,7 +94,7 @@ export interface Faq {
 export const sessionFaqs: Faq[] = [
 	{
 		q: 'How do I reserve a date?',
-		a: 'A $100 retainer, paid online by card, holds your date and comes off your package total. The rest is due after your session, before your gallery is delivered.'
+		a: 'A $100 retainer, paid online by card, holds your date and comes off your package total. The rest is due after your session, before your gallery is delivered. You can also pay in full up front.'
 	},
 	{
 		q: 'Where do sessions take place?',

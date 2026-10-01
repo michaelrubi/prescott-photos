@@ -1,8 +1,10 @@
 <!--
 	Card payments for a session: prescottphotos.com/pay. Michael links clients
 	here once a date is set, e.g. /pay?package=signature&for=retainer, and again
-	for the balance (&for=balance). Stripe Checkout takes the card; see
-	#lib/payments.ts for how the amount is worked out.
+	for the balance (&for=balance), or once to pay in full (&for=full). Stripe
+	Checkout takes the card; see #lib/payments.ts for how the amount is worked
+	out. The balance is whatever this email still owes for the package, so a
+	client who skipped the retainer pays the full price.
 -->
 <script lang="ts">
 	import { onMount, tick } from 'svelte';
@@ -13,14 +15,18 @@
 	import { paymentsEnabled, returnUrl, startCheckout, takeReturnState, type PaymentKind } from '#lib/payments.ts';
 
 	let pkg = $state(packages.find((p) => p.featured)?.id ?? packages[0].id);
-	let kind = $state<Exclude<PaymentKind, 'extras'>>('retainer');
-	let status = $state<'idle' | 'sending' | 'paid' | 'error'>('idle');
+	type Kind = Exclude<PaymentKind, 'extras'>;
+	const kinds: Kind[] = ['retainer', 'balance', 'full'];
+
+	let kind = $state<Kind>('retainer');
+	// 'settled': Stripe shows nothing left to pay for this package and email
+	let status = $state<'idle' | 'sending' | 'paid' | 'settled' | 'error'>('idle');
 	let canceled = $state(false);
 	let error = $state('');
 	let paidHeading = $state<HTMLElement>();
 
 	const selected = $derived(packages.find((p) => p.id === pkg)!);
-	const amounts = $derived({ retainer, balance: selected.price - retainer });
+	const amounts = $derived({ retainer, balance: selected.price - retainer, full: selected.price });
 	const money = (n: number) => `$${n.toLocaleString('en-US')}`;
 
 	onMount(() => {
@@ -28,7 +34,7 @@
 		const p = params.get('package');
 		const f = params.get('for');
 		if (packages.some((x) => x.id === p)) pkg = p!;
-		if (f === 'retainer' || f === 'balance') kind = f;
+		if (kinds.includes(f as Kind)) kind = f as Kind;
 
 		const back = takeReturnState();
 		if (back === 'paid') {
@@ -50,7 +56,7 @@
 			url.searchParams.set('package', pkg);
 			url.searchParams.set('for', kind);
 			history.replaceState(history.state, '', url);
-			await startCheckout({
+			const { paid } = await startCheckout({
 				kind,
 				package: pkg,
 				name: data.name.trim(),
@@ -58,6 +64,10 @@
 				success: returnUrl('paid'),
 				cancel: returnUrl('canceled')
 			});
+			if (paid) {
+				status = 'settled';
+				tick().then(() => paidHeading?.focus());
+			}
 		} catch (err) {
 			console.error('Checkout failed:', err);
 			status = 'error';
@@ -68,7 +78,7 @@
 
 <Seo
 	title="Pay for Your Session | Michael Rubi Photography"
-	description="Pay your session retainer or balance securely by card."
+	description="Pay your session retainer, balance or full package securely by card."
 	noindex
 />
 
@@ -76,7 +86,7 @@
 	<PageIntro
 		label="Payments"
 		title={'Pay securely\nby card.'}
-		lead="Pay your retainer or your session balance here. Checkout is handled by Stripe, so your card details never touch this site."
+		lead="Pay your retainer, your balance, or your whole package here. Checkout is handled by Stripe, so your card details never touch this site."
 	/>
 
 	<div class="layout">
@@ -85,6 +95,18 @@
 				<p class="mono">Payment received</p>
 				<h2 tabindex="-1" bind:this={paidHeading}>Thank you.</h2>
 				<p>Your payment went through and a receipt is on its way to your inbox. I'll be in touch with next steps.</p>
+				<Button href="/" variant="ghost">Back to the site</Button>
+			</section>
+		{:else if status === 'settled'}
+			<section class="done" aria-live="polite">
+				<p class="mono">Nothing to pay</p>
+				<h2 tabindex="-1" bind:this={paidHeading}>You're already paid up.</h2>
+				<p>
+					{kind === 'retainer'
+						? `Your ${selected.name} retainer has already been paid with that email.`
+						: `Your ${selected.name} package has already been paid in full with that email.`}
+					If that doesn't look right, reply to my email and I'll sort it out.
+				</p>
 				<Button href="/" variant="ghost">Back to the site</Button>
 			</section>
 		{:else if !paymentsEnabled}
@@ -118,7 +140,14 @@
 							<input type="radio" name="kind" value="balance" bind:group={kind} />
 							<span>
 								<strong>Balance · {money(amounts.balance)}</strong>
-								<small>The rest of your {selected.name} package, due before your gallery is delivered.</small>
+								<small>What's left after your retainer. If you haven't paid one, this is the full {money(selected.price)}.</small>
+							</span>
+						</label>
+						<label class="option">
+							<input type="radio" name="kind" value="full" bind:group={kind} />
+							<span>
+								<strong>Pay in full · {money(amounts.full)}</strong>
+								<small>The whole {selected.name} package at once, less anything you've already paid.</small>
 							</span>
 						</label>
 					</div>
@@ -139,7 +168,10 @@
 				{/if}
 
 				<div class="submit">
-					<p class="total"><span class="mono">Total</span> {money(amounts[kind])}</p>
+					<div class="total">
+						<p><span class="mono">Total</span> {money(amounts[kind])}</p>
+						{#if kind !== 'retainer'}<small>Checkout takes off anything you've already paid.</small>{/if}
+					</div>
 					<Button type="submit">{status === 'sending' ? 'Opening checkout…' : 'Continue to checkout'}</Button>
 				</div>
 			</form>
@@ -149,7 +181,8 @@
 			<h2 id="how" class="mono">How payment works</h2>
 			<ol>
 				<li><strong>A {money(retainer)} retainer</strong> holds your date once we've picked it together.</li>
-				<li><strong>The balance</strong> is due after your session, before your gallery is delivered.</li>
+				<li><strong>The balance</strong> is due after your session, before your gallery is delivered. It's whatever is left, so you're never charged twice.</li>
+				<li><strong>Or pay in full</strong> up front, and skip the retainer.</li>
 				<li><strong>Extra images</strong> you pick beyond your package are paid for in your gallery.</li>
 			</ol>
 			<p>Retainers are non-refundable but carry over if you reschedule. See the <a href="/terms">terms</a>.</p>
@@ -238,7 +271,7 @@
 		margin-bottom: var(--space-2);
 	}
 
-	/* Retainer / balance choice: two cards, the picked one outlined in amber */
+	/* Retainer / balance / in full: cards, the picked one outlined in amber */
 	.options {
 		display: grid;
 		grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
@@ -300,6 +333,10 @@
 		border-top: 1px solid var(--color-line);
 	}
 	.total {
+		display: grid;
+		gap: var(--space-1);
+	}
+	.total p {
 		display: flex;
 		align-items: baseline;
 		gap: var(--space-3);
@@ -307,6 +344,10 @@
 		font-size: var(--text-xl);
 		font-weight: 600;
 		letter-spacing: var(--tracking-tight);
+	}
+	.total small {
+		color: var(--color-text-muted);
+		font-size: var(--text-sm);
 	}
 	.total .mono {
 		font-size: var(--text-xs);

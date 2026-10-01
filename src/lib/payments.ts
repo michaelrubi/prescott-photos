@@ -10,7 +10,7 @@
  */
 import { site } from './site.ts';
 
-export type PaymentKind = 'retainer' | 'balance' | 'extras';
+export type PaymentKind = 'retainer' | 'balance' | 'full' | 'extras';
 
 export const paymentsEnabled = Boolean(site.checkoutWebhook);
 
@@ -23,7 +23,7 @@ export interface ExtrasQuote {
 
 interface CheckoutFields {
 	kind: PaymentKind;
-	/** Package id, for a retainer or balance */
+	/** Package id, for a retainer, balance or full payment */
 	package?: string;
 	/** Gallery id, for extras */
 	gallery?: string;
@@ -45,7 +45,8 @@ async function call<T>(fields: Record<string, string | undefined>): Promise<T> {
 
 /**
  * Opens Stripe Checkout in this tab. Resolves with `paid: true` instead when
- * there's nothing left to pay (extras that were already paid for).
+ * Stripe shows there's nothing left to pay: extras already paid for, or a
+ * package (or its retainer) this email already paid.
  */
 export async function startCheckout(fields: CheckoutFields) {
 	const { url } = await call<{ url?: string }>({ action: 'checkout', ...fields });
