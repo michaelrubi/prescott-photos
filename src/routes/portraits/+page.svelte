@@ -24,7 +24,7 @@
 </script>
 
 <Seo
-	title="Portrait Photographer in Prescott, AZ | Michael Rubi"
+	title="Portrait Photographer in Prescott, AZ | Prescott Photo · Michael Rubi"
 	description="Relaxed, guided portrait sessions in Prescott, Arizona: maternity, creative and themed shoots, milestones and headshots. Hand-edited images from ${startingPrice}."
 	jsonld={[service, faqPage(portraitFaqs)]}
 />

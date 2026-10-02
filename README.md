@@ -1,6 +1,6 @@
-# prescottphotos.com
+# prescottphoto.com
 
-Portfolio and booking site for Michael Rubi Photography, Prescott, Arizona.
+Portfolio and booking site for Prescott Photo (Rubiconetic LLC dba Prescott Photo), Prescott, Arizona.
 
 Built with SvelteKit 3 (release candidate), Svelte 5, vanilla CSS and GSAP. Every page is pre-rendered by `@sveltejs/adapter-static` and served from Firebase Hosting.
 
@@ -40,7 +40,7 @@ Site copy that repeats across pages or changes often (packages, prices, policies
 
 Clients pay by card through [Stripe Checkout](https://docs.stripe.com/payments/checkout). The site has no server, so the n8n **Stripe checkout** workflow (`checkoutWebhook` in `src/lib/site.ts`) holds the Stripe secret key. The browser only says what is being paid for; n8n works out the amount itself, creates a Checkout session and returns its URL (`src/lib/payments.ts`).
 
-- **Retainer, balance or in full:** `prescottphotos.com/pay`. Send a client `/pay?package=signature&for=retainer` once their date is set, and `&for=balance` before delivery, or `&for=full` to pay it all at once. Prices come from `packages` and `retainer` in `src/lib/content.ts`, published as `/pay/prices.json` for n8n to read. The balance (and a full payment) is the package price less whatever Stripe already received from that email for that package, so a client who skipped the retainer pays the full price and nobody pays twice. No database is involved: Stripe's own payment records are the ledger, so the client must use the same email both times.
+- **Retainer, balance or in full:** `prescottphoto.com/pay`. Send a client `/pay?package=signature&for=retainer` once their date is set, and `&for=balance` before delivery, or `&for=full` to pay it all at once. Prices come from `packages` and `retainer` in `src/lib/content.ts`, published as `/pay/prices.json` for n8n to read. The balance (and a full payment) is the package price less whatever Stripe already received from that email for that package, so a client who skipped the retainer pays the full price and nobody pays twice. No database is involved: Stripe's own payment records are the ledger, so the client must use the same email both times.
 - **Extra images:** once a client sends picks with more than their package includes, the gallery shows a "Pay by card" button for the extras. n8n counts the picks and reads the per-image price from Firestore, and subtracts anything Stripe already received for that gallery, so reopening a gallery and adding more only charges the difference.
 - **Prints** stay in the Pixieset store, not Stripe.
 
@@ -52,7 +52,7 @@ To switch from test to live payments, put the live secret key in the n8n Stripe 
 
 ## Logo
 
-The logo is Thumb Butte as seen looking west down Gurley Street, against a sunset sky inside the site's AF corner brackets. `brand/` holds the finished files: the mark (dark, light, black and white), lockups and stacked versions for both "Michael Rubi" and "Prescott Photos", and the favicon. They are plain filled paths, so they open the same in Figma, Canva, Lightroom or a print shop.
+The logo is Thumb Butte as seen looking west down Gurley Street, against a sunset sky inside the site's AF corner brackets. `brand/` holds the finished files: the mark (dark, light, black and white), lockups and stacked versions for "Michael Rubi", "Prescott Photo" and "Prescott Photos", and the favicon. They are plain filled paths, so they open the same in Figma, Canva, Lightroom or a print shop.
 
 `brand/generator/build.py` makes all of them from `brand/generator/skyline.txt`, the butte's outline traced from a photo, and also writes `static/favicon.svg` and `src/lib/brand/mark.ts` (the paths `Logo.svelte` draws). To change the logo, edit the generator and run it from the repo root:
 
@@ -83,8 +83,8 @@ At build time every photo is resized to several widths in AVIF and WebP (metadat
 
 Private galleries where a client picks their favorite shots from a culled session, instead of Michael choosing for them.
 
-- **Client:** `prescottphotos.com/g#<gallery id>`. They heart photos (a counter tracks their package's image count), open any photo full screen (P picks it there), and send their picks with an optional note. Picks save as they go, so they can come back on another device. Sending locks the picks until Michael reopens them.
-- **Michael:** `prescottphotos.com/g/admin`, signed in with Google. Create a gallery (title, client name, images included, optional per-image price for extras, a note), drop in the culled exports, copy the link. Picks appear live, with buttons to copy the file names for Lightroom's filename filter.
+- **Client:** `prescottphoto.com/g#<gallery id>`. They heart photos (a counter tracks their package's image count), open any photo full screen (P picks it there), and send their picks with an optional note. Picks save as they go, so they can come back on another device. Sending locks the picks until Michael reopens them.
+- **Michael:** `prescottphoto.com/g/admin`, signed in with Google. Create a gallery (title, client name, images included, optional per-image price for extras, a note), drop in the culled exports, copy the link. Picks appear live, with buttons to copy the file names for Lightroom's filename filter.
 
 Everything runs in the browser against Firestore (`src/lib/proofing/`); there's no server code. Uploads are resized in the browser to a 1600px proof and a 640px thumbnail, with all metadata removed, and stored as bytes in Firestore documents, because Cloud Storage needs the pay-as-you-go plan. The free plan's 1 GB of Firestore storage holds roughly 30 galleries of 80 photos, so delete galleries after delivery.
 
@@ -95,7 +95,7 @@ When a client sends picks, the page posts them (URL-encoded, like the booking fo
 ### One-time Firebase setup
 
 1. **Firestore:** Firebase console → Build → Firestore Database → Create database. Use the `(default)` database, Standard edition, a US location (`us-west2` is closest; it can't be changed later), and production mode.
-2. **Google sign-in:** Build → Authentication → Get started → Sign-in method → Google → Enable. Under Settings → Authorized domains, add `prescottphotos.com` (and the staging channel's domain to test there).
+2. **Google sign-in:** Build → Authentication → Get started → Sign-in method → Google → Enable. Under Settings → Authorized domains, add `prescottphoto.com` and `prescottphotos.com` (and the staging channel's domain to test there).
 3. **Web app:** Project settings → General → Your apps → Add app → Web, and link it to the Hosting site. The site reads its config from Hosting's `/__/firebase/init.json`, so nothing needs to be pasted into the code.
 4. **Rules and indexes:** from this repo, `firebase deploy --only firestore` (needs the Firebase CLI signed in to the project). CI deploys Hosting only.
 

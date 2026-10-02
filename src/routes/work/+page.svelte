@@ -32,7 +32,7 @@
 </script>
 
 <Seo
-	title="Portfolio | Michael Rubi Photography, Prescott AZ"
+	title="Portfolio | Prescott Photo, Prescott AZ"
 	description="Portrait, couple and family photography by Michael Rubi in Prescott, Arizona. Browse the full portfolio."
 />
 

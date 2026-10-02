@@ -103,7 +103,7 @@
 </script>
 
 <Seo
-	title="Michael Rubi Photography | Portraits in Prescott, Arizona"
+	title="Prescott Photo | Portraits by Michael Rubi in Prescott, Arizona"
 	description="Modern portrait photography in Prescott, Arizona. Relaxed, guided sessions for maternity, creative portraits, milestones, headshots and couples."
 	image={data.heroShare}
 	jsonld={[business(data.heroShare), person]}

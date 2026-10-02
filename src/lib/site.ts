@@ -1,14 +1,13 @@
 export const site = {
-	name: 'Michael Rubi Photography',
-	legalName: 'Michael Rubi Photography LLC',
-	url: 'https://prescottphotos.com',
+	name: 'Prescott Photo',
+	legalName: 'Rubiconetic LLC dba Prescott Photo',
+	url: 'https://prescottphoto.com',
 	locale: 'en_US',
 	region: 'Prescott, Arizona',
 	/**
-	 * Name set next to the logo in the header. To brand as Prescott Photos, use
-	 * { name: 'Prescott Photos', tagline: 'By Michael Rubi' }.
+	 * Name set next to the logo in the header.
 	 */
-	brand: { name: 'Michael Rubi', tagline: 'Photography · Prescott AZ' },
+	brand: { name: 'Prescott Photo', tagline: 'Portraits by Michael Rubi' },
 	/** Towns sessions are offered in without a travel fee, used in copy and structured data */
 	serviceArea: ['Prescott', 'Prescott Valley', 'Chino Valley', 'Dewey-Humboldt', 'Sedona'],
 	social: {
