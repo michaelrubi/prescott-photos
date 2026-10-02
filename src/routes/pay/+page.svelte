@@ -1,5 +1,5 @@
 <!--
-	Card payments for a session: prescottphotos.com/pay. Michael links clients
+	Card payments for a session: prescottphoto.com/pay. Michael links clients
 	here once a date is set, e.g. /pay?package=signature&for=retainer, and again
 	for the balance (&for=balance), or once to pay in full (&for=full). Stripe
 	Checkout takes the card; see #lib/payments.ts for how the amount is worked
@@ -77,7 +77,7 @@
 </script>
 
 <Seo
-	title="Pay for Your Session | Michael Rubi Photography"
+	title="Pay for Your Session | Prescott Photo"
 	description="Pay your session retainer, balance or full package securely by card."
 	noindex
 />

@@ -27,7 +27,7 @@
 </script>
 
 <Seo
-	title="Sessions & Pricing | Michael Rubi Photography, Prescott AZ"
+	title="Sessions & Pricing | Prescott Photo, Prescott AZ"
 	description="Portrait session packages in Prescott, Arizona from ${startingPrice}, with hand-edited digital images included. Prints, albums and wall art available from your gallery."
 	jsonld={[catalog, faqPage(sessionFaqs)]}
 />

@@ -235,7 +235,7 @@ def icon():
         f'<rect x="-14" y="-14" width="228" height="228" rx="48" fill="{INK}"/>'
         f'<path fill="{BONE}" d="{to_d(f)}"/><path fill="{AMBER}" d="{to_d(s)}"/><path fill="{BONE}" d="{to_d(b)}"/>'
     )
-    return svg("-14 -14 228 228", body, "Michael Rubi Photography")
+    return svg("-14 -14 228 228", body, "Prescott Photo")
 
 
 def lockup(name, sub, frame=BONE, sky=AMBER, sil=BUTTE, name_fill=BONE, sub_fill=AMBER, stacked=False):
@@ -267,6 +267,7 @@ def lockup(name, sub, frame=BONE, sky=AMBER, sil=BUTTE, name_fill=BONE, sub_fill
 
 NAMES = {
     "michael-rubi": ("Michael Rubi", "PHOTOGRAPHY · PRESCOTT AZ"),
+    "prescott-photo": ("Prescott Photo", "BY MICHAEL RUBI"),
     "prescott-photos": ("Prescott Photos", "BY MICHAEL RUBI"),
 }
 PAPER = dict(frame=INK, sky=AMBER, sil=INK, name_fill=INK, sub_fill=AMBER_PAPER)

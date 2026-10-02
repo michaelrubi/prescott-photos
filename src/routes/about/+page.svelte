@@ -31,7 +31,7 @@
 </script>
 
 <Seo
-	title="About Michael Rubi | Portrait Photographer in Prescott, AZ"
+	title="About Michael Rubi | Prescott Photo, Prescott AZ"
 	description="Michael Rubi is a portrait photographer in Prescott, Arizona and a 14-year US Air Force veteran who makes being photographed feel easy."
 	image={mine && shareImages[mine]}
 	jsonld={[{ '@type': 'AboutPage', mainEntity: person }]}

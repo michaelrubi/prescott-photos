@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://prescottphotos.com/sitemap.xml
+Sitemap: https://prescottphoto.com/sitemap.xml

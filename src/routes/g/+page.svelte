@@ -1,5 +1,5 @@
 <!--
-	A client's proofing gallery: prescottphotos.com/g#<gallery id>. The id
+	A client's proofing gallery: prescottphoto.com/g#<gallery id>. The id
 	sits in the URL hash so it never reaches a server log or a Referer header.
 	Everything loads in the browser from Firestore (see #lib/proofing).
 -->

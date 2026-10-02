@@ -20,7 +20,7 @@
 	] as const;
 </script>
 
-<Seo title="Style preview | Michael Rubi Photography" description="Design system preview." noindex />
+<Seo title="Style preview | Prescott Photo" description="Design system preview." noindex />
 
 
 <main>

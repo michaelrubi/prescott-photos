@@ -6,8 +6,8 @@
 
 <footer>
 	<div class="brand">
-		<a class="name" href="/">Michael Rubi</a>
-		<p>Portrait photographer in Prescott, Arizona. Serving {site.serviceArea.slice(1, -1).join(', ')} and {site
+		<a class="name" href="/">{site.brand.name}</a>
+		<p>Portraits by Michael Rubi in Prescott, Arizona. Serving {site.serviceArea.slice(1, -1).join(', ')} and {site
 				.serviceArea.at(-1)}.</p>
 	</div>
 

@@ -78,7 +78,7 @@
 </script>
 
 <Seo
-	title="Book a Portrait Session | Michael Rubi Photography, Prescott AZ"
+	title="Book a Portrait Session | Prescott Photo, Prescott AZ"
 	description="Check availability and book a portrait, headshot, senior, couple or family session in Prescott, Arizona with Michael Rubi."
 />
 
