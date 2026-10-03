@@ -15,7 +15,7 @@ export const site = {
 		facebook: 'https://www.facebook.com/MichaelRubiPhoto/'
 	},
 	/**
-	 * n8n webhook (POST, JSON) that receives booking inquiries and notifies
+	 * n8n webhook (POST, URL-encoded) that receives booking inquiries and notifies
 	 * Michael. It's called from the browser, so it must allow this site's origin.
 	 */
 	inquiryWebhook: 'https://n8n.rubiconetic.com/webhook/7fa008b1-a6b8-4664-9075-5434e66e4409',
