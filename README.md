@@ -39,6 +39,7 @@ Imports from `src/lib` use Node subpath imports with the file extension: `import
 ```
 photos/<category>/     portfolio JPGs + photos.json (alt text, order, options)
 photos/about/          Michael's photo for the About page
+posts/<slug>/          blog posts: index.md plus the post's own photos
 src/lib/site.ts        name, domain, social links, n8n webhook URLs
 src/lib/content.ts     packages, prices, retainer, policies, FAQs, locations
 src/lib/styles/        design tokens and base styles
@@ -75,6 +76,30 @@ Put high-quality JPGs, about 2560px on the long edge, in `photos/portraits/`, `p
 At build time every photo is resized to several widths in AVIF and WebP with metadata (including GPS) stripped, gets a tiny ThumbHash blur placeholder, and has its lens, aperture, shutter and ISO read from EXIF for the captions. `node scripts/make-sample-photos.js` generates placeholder images for testing.
 
 For the About page, put one JPG in `photos/about/` (any name). It's shown in a 4:5 crop, used as that page's share image, and never appears in the portfolio.
+
+### Write a blog post
+
+Make a folder in `posts/` named for the post's URL and put the post in `index.md` inside it. `posts/watson-lake-guide/index.md` becomes `/blog/watson-lake-guide`.
+
+```md
+---
+title: The best photo spots in Prescott, AZ
+description: One or two sentences for Google and share cards.
+date: 2026-10-19
+draft: true
+cover: /photos/portraits/MJR00444.jpg
+---
+
+Write in Markdown. Use `##` for section headings (the title is the page's only `#`).
+
+![Alt text describing the photo](watson-lake.jpg "Optional caption")
+```
+
+- A photo on a line of its own goes through the same AVIF/WebP pipeline as the portfolio. A bare file name means a JPG in the post's own folder; a path starting `/photos/` reuses a portfolio photo.
+- `cover` is the image at the top, in the blog list and on share cards. Its alt text comes from `photos.json` for portfolio photos, or add `coverAlt:` for the post's own photos.
+- `draft: true` shows the post in `pnpm dev` with a Draft tag. In a build it's still at its URL (so a preview link works) but it's marked noindex and left out of the blog list and sitemap. Delete the line to publish.
+- Add `updated: 2026-11-02` after a meaningful edit; it goes in the sitemap and structured data.
+- The Blog link appears in the header and footer once there's at least one published post.
 
 ### Change prices, packages or policies
 
