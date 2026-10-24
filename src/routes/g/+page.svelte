@@ -31,7 +31,7 @@
 	const picked = new SvelteSet<string>();
 	let note = $state('');
 	let submitted = $state(false);
-	let showPicked = $state(false);
+	let filterIds = $state<Set<string> | null>(null);
 	let saveState = $state<'idle' | 'saving' | 'saved' | 'error'>('idle');
 	let toast = $state('');
 	let submitError = $state('');
@@ -42,6 +42,7 @@
 	let payError = $state('');
 	let grid = $state<HTMLElement>();
 	let dialog = $state<HTMLDialogElement>();
+	let noteInput = $state<HTMLTextAreaElement>();
 
 	let api: Api;
 	let db: Firestore;
@@ -49,8 +50,15 @@
 	let full: ReturnType<Api['fullImages']>;
 	let viewer: ReturnType<typeof proofViewer> | undefined;
 
+	const shortName = (name: string) => name.replace(/\.[^.]+$/, '');
 	const canPick = $derived(!!gallery?.open && !submitted);
-	const visible = $derived(showPicked ? photos.filter((p) => picked.has(p.id)) : photos);
+	const showPicked = $derived(filterIds !== null);
+	// Snapshot the filter set when entering "Show picks" so unpicking a photo
+	// dims it in place instead of making it vanish from the grid or open viewer.
+	const visible = $derived(
+		filterIds ? photos.filter((p) => filterIds!.has(p.id) || picked.has(p.id)) : photos
+	);
+	const pickedPhotos = $derived(photos.filter((p) => picked.has(p.id)));
 	const included = $derived(gallery?.included ?? 0);
 	const extras = $derived(Math.max(0, picked.size - included));
 	const extraTotal = $derived(extras * (gallery?.extraPrice ?? 0));
@@ -64,9 +72,19 @@
 	onMount(() => {
 		load();
 		const reload = () => location.reload();
+		const flushPending = () => {
+			if (saveTimer) flushSave();
+		};
+		const onVisibility = () => {
+			if (document.visibilityState === 'hidden') flushPending();
+		};
 		window.addEventListener('hashchange', reload);
+		window.addEventListener('pagehide', flushPending);
+		document.addEventListener('visibilitychange', onVisibility);
 		return () => {
 			window.removeEventListener('hashchange', reload);
+			window.removeEventListener('pagehide', flushPending);
+			document.removeEventListener('visibilitychange', onVisibility);
 			viewer?.destroy();
 		};
 	});
@@ -111,7 +129,8 @@
 				full: (id) => full.get(id),
 				isPicked: (id) => picked.has(id),
 				toggle,
-				canPick: () => canPick
+				canPick: () => canPick,
+				tally: () => `${picked.size} of ${included} picked${extras > 0 ? ` · +${extras} (${money(extraTotal)})` : ''}`
 			});
 		} catch (error) {
 			console.error(error);
@@ -126,10 +145,27 @@
 		toastTimer = setTimeout(() => (toast = ''), 4000);
 	}
 
+	function toggleFilter() {
+		filterIds = filterIds ? null : new Set(picked);
+	}
+
+	function mentionPhoto(name: string) {
+		const tag = `${name}: `;
+		if (!note.includes(name)) {
+			note = note.trim() ? `${note.trimEnd()}\n${tag}` : tag;
+			if (canPick) queueSave();
+		}
+		noteInput?.focus();
+	}
+
 	function toggle(id: string) {
 		if (!gallery || !canPick) return;
 		if (picked.has(id)) {
 			picked.delete(id);
+			if (picked.size <= gallery.included && toast) {
+				clearTimeout(toastTimer);
+				toast = '';
+			}
 		} else if (picked.size >= gallery.included && gallery.extraPrice <= 0) {
 			say(`Your package includes ${gallery.included} photos. Unpick one to swap it for this one.`);
 			return;
@@ -318,7 +354,12 @@
 		<ul class="grid" bind:this={grid}>
 			{#each visible as photo, i (photo.id)}
 				{@const isPicked = picked.has(photo.id)}
-				<li data-pid={photo.id} class:picked={isPicked} style:--ar={photo.width / photo.height}>
+				<li
+					data-pid={photo.id}
+					class:picked={isPicked}
+					class:unpicked={showPicked && !isPicked}
+					style:--ar={photo.width / photo.height}
+				>
 					<button class="open" type="button" onclick={() => openViewer(i)} aria-label="View {photo.name}">
 						<img src={photo.thumbUrl} alt="" width={photo.width} height={photo.height} loading="lazy" decoding="async" />
 					</button>
@@ -338,29 +379,39 @@
 							</svg>
 						</button>
 					{/if}
-					<span class="name mono">{photo.name.replace(/\.[^.]+$/, '')}</span>
+					<span class="name mono">{shortName(photo.name)}</span>
 				</li>
 			{/each}
 		</ul>
 
 		<div class="bar">
 			<div class="count">
-				<p>
-					<strong>{picked.size}</strong> of {included} picked{#if extras > 0}<span class="extra">
-							+ {extras} extra{extras === 1 ? '' : 's'} · {money(extraTotal)}</span
-						>{/if}
-				</p>
+				<div class="count-head">
+					<p>
+						<strong>{picked.size}</strong> of {included} picked{#if extras > 0}<span class="extra"
+								>{' · '}+{extras} extra{extras === 1 ? '' : 's'} · {money(extraTotal)}</span
+							>{/if}
+					</p>
+					{#if saveState !== 'idle'}
+						<p class="mono save" class:save-error={saveState === 'error'} aria-live="polite">
+							{#if saveState === 'saving'}Saving…{:else if saveState === 'saved'}Saved{:else if saveState === 'error'}Not
+								saved · <button class="retry" type="button" onclick={() => flushSave()}>Retry</button>{/if}
+						</p>
+					{/if}
+				</div>
 				<div class="meter" aria-hidden="true">
 					<span style:width="{Math.min(100, (picked.size / Math.max(1, included)) * 100)}%"></span>
 				</div>
-				<p class="mono save" aria-live="polite">
-					{#if saveState === 'saving'}Saving…{:else if saveState === 'saved'}Saved{:else if saveState === 'error'}Not
-						saved. Check your connection{/if}
-				</p>
 			</div>
 			<div class="actions">
-				<button class="filter" type="button" aria-pressed={showPicked} onclick={() => (showPicked = !showPicked)}>
-					{showPicked ? 'Show all' : 'Show picks'}
+				<button
+					class="filter"
+					type="button"
+					aria-pressed={showPicked}
+					disabled={!showPicked && picked.size === 0}
+					onclick={toggleFilter}
+				>
+					{showPicked ? `Show all (${photos.length})` : `Show picks (${picked.size})`}
 				</button>
 				{#if canPick}
 					<button class="send" type="button" disabled={picked.size === 0} onclick={() => dialog?.showModal()}>
@@ -372,9 +423,9 @@
 
 		{#if toast}<p class="toast" role="status">{toast}</p>{/if}
 
-		<dialog bind:this={dialog} aria-labelledby="send-title">
+		<dialog bind:this={dialog} aria-labelledby="send-title" onclick={(e) => e.target === dialog && dialog.close()}>
 			<form onsubmit={submit}>
-				<h2 id="send-title">Send your {picked.size} picks?</h2>
+				<h2 id="send-title">Send your {picked.size} pick{picked.size === 1 ? '' : 's'}?</h2>
 				{#if picked.size < included}
 					<p>
 						Your package includes {included}, so you have {included - picked.size} more you can pick. You can send these
@@ -391,11 +442,32 @@
 				{:else}
 					<p>That's your full package. Michael will start editing these.</p>
 				{/if}
+				{#if pickedPhotos.length > 0}
+					<ul class="review-strip" aria-label="Your picked photos">
+						{#each pickedPhotos as photo (photo.id)}
+							{@const sname = shortName(photo.name)}
+							<li>
+								<button
+									type="button"
+									class="review-thumb"
+									class:mentioned={note.includes(sname)}
+									title="Mention {sname} in your note"
+									onclick={() => mentionPhoto(sname)}
+								>
+									<img src={photo.thumbUrl} alt="" width={photo.width} height={photo.height} loading="lazy" />
+									<span class="mono">{sname}</span>
+								</button>
+							</li>
+						{/each}
+					</ul>
+				{/if}
 				<p>Once they're sent, your picks are locked. Michael can reopen them if you change your mind.</p>
 				<label>
-					<span>Anything Michael should know? <em>(optional)</em></span>
+					<span>Anything Michael should know? <em>(optional · tap a photo above to mention it)</em></span>
 					<textarea
+						bind:this={noteInput}
 						bind:value={note}
+						oninput={() => canPick && queueSave()}
 						rows="3"
 						maxlength="2000"
 						placeholder="Crop ideas, a favorite you'd like in black and white…"
@@ -475,7 +547,7 @@
 
 	/* Justified rows: each photo grows in proportion to its aspect ratio */
 	.grid {
-		--row: clamp(9rem, 22vw, 15rem);
+		--row: clamp(10.5rem, 22vw, 15rem);
 		display: flex;
 		flex-wrap: wrap;
 		gap: var(--space-2);
@@ -502,6 +574,8 @@
 		border: 0;
 		background: none;
 		cursor: zoom-in;
+		touch-action: manipulation;
+		-webkit-tap-highlight-color: transparent;
 	}
 	.open img {
 		width: 100%;
@@ -509,23 +583,42 @@
 		object-fit: cover;
 		transition: opacity var(--duration-base) var(--ease-focus);
 	}
-	.picked {
-		outline: 2px solid var(--color-accent);
-		outline-offset: 2px;
+	.unpicked .open img {
+		opacity: 0.38;
+		filter: grayscale(0.5);
+	}
+	.picked::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		box-shadow: inset 0 0 0 2px var(--color-accent);
+		pointer-events: none;
 	}
 	.name {
 		position: absolute;
-		left: var(--space-2);
+		left: var(--space-1);
 		bottom: var(--space-1);
-		color: rgb(255 255 255 / 0.8);
-		text-shadow: 0 1px 4px rgb(0 0 0 / 0.7);
+		max-width: calc(100% - 2 * var(--space-1));
+		padding: 0.15rem 0.45rem;
+		border-radius: 0.25rem;
+		background: rgb(0 0 0 / 0.55);
+		color: #ecebe8;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
 		pointer-events: none;
 		opacity: 0;
 		transition: opacity var(--duration-fast);
 	}
 	.grid li:hover .name,
-	.grid li:focus-within .name {
+	.grid li:focus-within .name,
+	.grid li.picked .name {
 		opacity: 1;
+	}
+	@media (hover: none) {
+		.name {
+			opacity: 1;
+		}
 	}
 
 	.heart {
@@ -539,9 +632,11 @@
 		padding: 0;
 		border: 0;
 		border-radius: 50%;
-		background: rgb(0 0 0 / 0.35);
+		background: rgb(0 0 0 / 0.4);
 		backdrop-filter: blur(6px);
 		cursor: pointer;
+		touch-action: manipulation;
+		-webkit-tap-highlight-color: transparent;
 	}
 	.heart:disabled {
 		cursor: default;
@@ -573,7 +668,7 @@
 		justify-content: space-between;
 		gap: var(--space-3);
 		margin: var(--space-4) calc(var(--gutter) * -1) 0;
-		padding: var(--space-3) var(--gutter);
+		padding: var(--space-3) var(--gutter) max(var(--space-3), env(safe-area-inset-bottom, 0px));
 		border-top: 1px solid var(--color-line);
 		background: color-mix(in oklab, var(--color-bg), transparent 10%);
 		backdrop-filter: blur(12px);
@@ -581,7 +676,14 @@
 	.count {
 		display: grid;
 		gap: var(--space-1);
-		min-width: 12rem;
+		flex: 1 1 14rem;
+		min-width: 0;
+	}
+	.count-head {
+		display: flex;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: var(--space-2);
 	}
 	.count strong {
 		font-size: var(--text-lg);
@@ -601,7 +703,21 @@
 		transition: width var(--duration-base) var(--ease-focus);
 	}
 	.save {
-		min-height: 1.2em;
+		white-space: nowrap;
+	}
+	.save-error {
+		color: var(--color-accent);
+	}
+	.retry {
+		padding: 0;
+		border: 0;
+		background: none;
+		color: inherit;
+		font: inherit;
+		letter-spacing: inherit;
+		text-transform: inherit;
+		text-decoration: underline;
+		cursor: pointer;
 	}
 	.actions,
 	.dialog-actions {
@@ -618,6 +734,8 @@
 		color: var(--color-text);
 		font: 500 var(--text-sm) / 1 var(--font-sans);
 		cursor: pointer;
+		touch-action: manipulation;
+		-webkit-tap-highlight-color: transparent;
 	}
 	.filter[aria-pressed='true'] {
 		border-color: var(--color-accent);
@@ -627,16 +745,32 @@
 		background: var(--color-accent);
 		color: var(--color-accent-text);
 	}
+	.filter:disabled,
 	.send:disabled {
 		opacity: 0.4;
 		cursor: not-allowed;
+	}
+	@media (max-width: 38rem) {
+		.bar {
+			gap: var(--space-2);
+		}
+		.count {
+			flex-basis: 100%;
+		}
+		.actions {
+			width: 100%;
+		}
+		.actions > button {
+			flex: 1;
+			text-align: center;
+		}
 	}
 
 	.toast {
 		position: fixed;
 		left: 50%;
-		bottom: 6.5rem;
-		z-index: 20;
+		bottom: calc(6.5rem + env(safe-area-inset-bottom, 0px));
+		z-index: 100010;
 		max-width: min(32rem, calc(100vw - 2rem));
 		padding: var(--space-2) var(--space-3);
 		border-radius: 0.5rem;
@@ -648,6 +782,8 @@
 
 	dialog {
 		width: min(34rem, calc(100vw - 2rem));
+		max-height: calc(100dvh - 2rem);
+		overflow-y: auto;
 		padding: var(--space-5) var(--space-4);
 		border: 1px solid var(--color-line);
 		background: var(--color-surface);
@@ -668,6 +804,54 @@
 	}
 	dialog p {
 		color: var(--color-text-muted);
+	}
+	.review-strip {
+		display: flex;
+		gap: var(--space-2);
+		margin: 0;
+		padding: 0 0 var(--space-1);
+		list-style: none;
+		overflow-x: auto;
+		scrollbar-width: thin;
+	}
+	.review-strip li {
+		flex: 0 0 4.75rem;
+	}
+	.review-thumb {
+		display: grid;
+		gap: var(--space-1);
+		width: 100%;
+		padding: 0;
+		border: 0;
+		background: none;
+		color: var(--color-text);
+		text-align: left;
+		cursor: pointer;
+		user-select: none;
+		touch-action: manipulation;
+		-webkit-tap-highlight-color: transparent;
+	}
+	.review-thumb img {
+		width: 100%;
+		aspect-ratio: 1;
+		object-fit: cover;
+		background: var(--color-bg);
+		border: 1px solid var(--color-line);
+		transition: border-color var(--duration-fast);
+	}
+	.review-thumb:hover img,
+	.review-thumb:focus-visible img,
+	.review-thumb.mentioned img {
+		border-color: var(--color-accent);
+	}
+	.review-thumb.mentioned .mono {
+		color: var(--color-accent);
+	}
+	.review-thumb .mono {
+		display: block;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
 	}
 	label {
 		display: grid;
@@ -694,6 +878,11 @@
 		color: var(--color-text);
 		font: inherit;
 		resize: vertical;
+		transition: border-color var(--duration-fast);
+	}
+	textarea:focus {
+		outline: none;
+		border-bottom-color: var(--color-accent);
 	}
 	.error {
 		padding: var(--space-3);
