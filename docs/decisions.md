@@ -118,6 +118,14 @@ Open questions and unconfirmed content are listed at the end.
 
 **Why:** Fixes the old site's identical titles and missing metadata, and keeps prices in one place so the Sessions page, the FAQ and the payment amounts can't drift apart.
 
+### Blog posts as Markdown files (2026-10-19)
+
+**Decision:** Each post is `posts/<slug>/index.md` with a few lines of front matter, rendered at build time with `marked` and prerendered at `/blog/<slug>`. Photos on their own line are pulled out of the Markdown and rendered with `enhanced:img`, so post photos get the same resizing, formats and GPS stripping as the portfolio. Posts carry `BlogPosting` and breadcrumb JSON-LD, `article` Open Graph tags, and sitemap entries with `lastmod`. `draft: true` keeps a post noindexed and out of the list and sitemap while still giving it a preview URL.
+
+**Why:** Same reasoning as the portfolio: no CMS account, and a new post is a file drop and a pull request with a preview link. Local location guides and session-planning posts are the content most likely to rank for searches like "Prescott photographer" and "photo spots in Prescott."
+
+**Rejected:** mdsvex (posts as Svelte components would need a different image story and more setup for what is plain prose), and a hosted blog on a subdomain (splits the site's search ranking).
+
 ## Booking, proofing and payments
 
 ### Booking form posts straight to n8n (2026-10-01, [#10](https://github.com/michaelrubi/prescott-photos/pull/10), [#11](https://github.com/michaelrubi/prescott-photos/pull/11), [#12](https://github.com/michaelrubi/prescott-photos/pull/12))
@@ -178,6 +186,7 @@ These are live on the site but were written as drafts and haven't been confirmed
 - **Policies:** one free reschedule with 48 hours' notice, retainer forfeited on cancellation, delivery in two weeks (one week for Full Story), galleries kept for 90 days, replies within two business days.
 - **Terms and Privacy pages:** written from scratch because the old legal pages couldn't be read; not reviewed by a lawyer.
 - **Prescott location list and the single testimonial.**
+- **The first blog post** (`posts/prescott-photo-locations`) is a draft. Its light, timing and parking notes need Michael's check, and it needs photos from the actual locations.
 
 Still to decide or do:
 

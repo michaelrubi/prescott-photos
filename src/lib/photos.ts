@@ -34,17 +34,18 @@ export interface PhotoMeta {
 }
 
 /**
- * Every photo, resized to several widths in AVIF and WebP at build time.
- * `@sveltejs/enhanced-img` strips metadata (including GPS) from the output.
+ * Every photo (portfolio and blog posts), resized to several widths in AVIF and
+ * WebP at build time. `@sveltejs/enhanced-img` strips metadata (including GPS)
+ * from the output.
  */
-export const pictures = import.meta.glob<Picture>('/photos/*/*.{jpg,jpeg,JPG,JPEG}', {
+export const pictures = import.meta.glob<Picture>(['/photos/*/*.{jpg,jpeg,JPG,JPEG}', '/posts/*/*.{jpg,jpeg,JPG,JPEG}'], {
 	eager: true,
 	import: 'default',
 	query: { enhanced: true, w: '2560;1920;1280;960;640' }
 });
 
 /** 1200×630 JPG crops of every photo, for social share cards. */
-export const shareImages = import.meta.glob<string>('/photos/*/*.{jpg,jpeg,JPG,JPEG}', {
+export const shareImages = import.meta.glob<string>(['/photos/*/*.{jpg,jpeg,JPG,JPEG}', '/posts/*/*.{jpg,jpeg,JPG,JPEG}'], {
 	eager: true,
 	import: 'default',
 	query: { w: '1200', h: '630', fit: 'cover', format: 'jpg', quality: '80' }

@@ -3,6 +3,8 @@
 	import { nav, site } from '#lib/site.ts';
 	import Button from './Button.svelte';
 	import Logo from './Logo.svelte';
+
+	const links = $derived(nav.filter((link) => link.href !== '/blog' || page.data.blog));
 </script>
 
 <header>
@@ -15,8 +17,9 @@
 	</a>
 	<nav aria-label="Main">
 		<ul>
-			{#each nav as link (link.href)}
-				<li>
+			{#each links as link (link.href)}
+				<!-- No room for Blog on phones; it's still in the footer -->
+				<li class:wide-only={link.href === '/blog'}>
 					<a href={link.href} aria-current={page.url.pathname === link.href ? 'page' : undefined}>
 						{link.label}
 					</a>
@@ -116,6 +119,11 @@
 		}
 		nav a {
 			font-size: var(--text-xs);
+		}
+	}
+	@media (max-width: 30rem) {
+		.wide-only {
+			display: none;
 		}
 	}
 </style>

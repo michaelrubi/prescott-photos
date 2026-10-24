@@ -11,7 +11,8 @@
 		description,
 		image,
 		noindex = false,
-		jsonld = []
+		jsonld = [],
+		article
 	}: {
 		title: string;
 		description: string;
@@ -19,6 +20,8 @@
 		image?: string;
 		noindex?: boolean;
 		jsonld?: object[];
+		/** Publish and edit dates (ISO) for a blog post, which makes it an `article` card */
+		article?: { published: string; modified?: string };
 	} = $props();
 
 	const url = $derived(site.url + (page.url.pathname === '/' ? '' : page.url.pathname));
@@ -44,7 +47,11 @@
 	{:else}
 		<link rel="canonical" href={url} />
 	{/if}
-	<meta property="og:type" content="website" />
+	<meta property="og:type" content={article ? 'article' : 'website'} />
+	{#if article}
+		<meta property="article:published_time" content={article.published} />
+		{#if article.modified}<meta property="article:modified_time" content={article.modified} />{/if}
+	{/if}
 	<meta property="og:site_name" content={site.name} />
 	<meta property="og:locale" content={site.locale} />
 	<meta property="og:title" content={title} />

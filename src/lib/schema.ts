@@ -1,3 +1,4 @@
+import type { PostMeta } from './posts.ts';
 import { site } from './site.ts';
 
 /** Structured data shared across pages, so Google can describe the business. */
@@ -36,6 +37,35 @@ export function faqPage(faqs: { q: string; a: string }[]) {
 			'@type': 'Question',
 			name: q,
 			acceptedAnswer: { '@type': 'Answer', text: a }
+		}))
+	};
+}
+
+export function blogPosting(post: PostMeta, image?: string) {
+	const url = `${site.url}/blog/${post.slug}`;
+	return {
+		'@type': 'BlogPosting',
+		'@id': `${url}#post`,
+		headline: post.title,
+		description: post.description,
+		url,
+		mainEntityOfPage: url,
+		image: image && new URL(image, site.url).href,
+		datePublished: post.date,
+		dateModified: post.updated ?? post.date,
+		author: { '@type': 'Person', '@id': person['@id'], name: person.name, url: person.url },
+		publisher: { '@type': 'Organization', '@id': `${site.url}/#business`, name: site.name, url: site.url }
+	};
+}
+
+export function breadcrumbs(items: { name: string; path: string }[]) {
+	return {
+		'@type': 'BreadcrumbList',
+		itemListElement: items.map((item, i) => ({
+			'@type': 'ListItem',
+			position: i + 1,
+			name: item.name,
+			item: site.url + item.path
 		}))
 	};
 }

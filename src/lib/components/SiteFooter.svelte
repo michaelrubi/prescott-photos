@@ -1,7 +1,9 @@
 <script lang="ts">
+	import { page } from '$app/state';
 	import { nav, site } from '#lib/site.ts';
 
 	const year = new Date().getFullYear();
+	const links = $derived(nav.filter((link) => link.href !== '/blog' || page.data.blog));
 </script>
 
 <footer>
@@ -16,7 +18,7 @@
 			<p class="mono">Explore</p>
 			<ul>
 				<li><a href="/">Home</a></li>
-				{#each nav as link (link.href)}
+				{#each links as link (link.href)}
 					<li><a href={link.href}>{link.label}</a></li>
 				{/each}
 			</ul>
