@@ -30,10 +30,18 @@
 	position: absolute;
 	inset: auto 0 0 0;
 	display: flex;
+	align-items: center;
 	justify-content: space-between;
 	gap: 1rem;
-	padding: 1rem clamp(1rem, 4vw, 2rem);
+	padding: 1.25rem clamp(1rem, 4vw, 2rem) max(0.85rem, env(safe-area-inset-bottom, 0px));
+	background: linear-gradient(to top, rgb(5 5 5 / 0.85), transparent);
 	color: rgb(236 235 232 / 0.75);
+	pointer-events: none;
+	transition: opacity 150ms;
+}
+.pswp:not(.pswp--ui-visible) .pswp__viewfinder,
+.pswp:not(.pswp--ui-visible) .pswp__pick {
+	opacity: 0;
 	pointer-events: none;
 }
 .pswp__frame {
@@ -41,29 +49,67 @@
 	white-space: nowrap;
 }
 
-/* Proofing galleries: the heart that picks the open photo */
-.pswp__button--pick {
+/* Proofing galleries: bottom HUD metadata + thumb-zone pick pill */
+.pswp__meta {
 	display: grid;
-	place-items: center;
-	width: 50px;
-	height: 60px;
+	gap: 0.25rem;
+	min-width: 0;
 }
-.pswp__button--pick svg {
-	width: 26px;
-	height: 26px;
+.pswp__title {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+.pswp__tally {
+	color: var(--color-accent, #f2a35e);
+}
+.pswp__pick {
+	pointer-events: auto;
+	flex-shrink: 0;
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	min-height: 2.75rem;
+	padding: 0 1.15rem;
+	border: 1px solid rgb(255 255 255 / 0.2);
+	border-radius: 999px;
+	background: rgb(20 20 22 / 0.85);
+	backdrop-filter: blur(8px);
+	color: var(--color-text, #ecebe8);
+	font: 500 var(--text-sm, 0.875rem) / 1 var(--font-sans);
+	letter-spacing: 0.01em;
+	text-transform: none;
+	cursor: pointer;
+	touch-action: manipulation;
+	-webkit-tap-highlight-color: transparent;
+	transition:
+		border-color 150ms,
+		background-color 150ms,
+		transform 150ms;
+}
+.pswp__pick[hidden] {
+	display: none;
+}
+.pswp__pick:disabled {
+	cursor: default;
+}
+.pswp__pick svg {
+	width: 1.25rem;
+	height: 1.25rem;
 	fill: transparent;
-	stroke: var(--pswp-icon-color);
-	stroke-width: 1.6;
+	stroke: currentColor;
+	stroke-width: 1.7;
 	transition:
 		fill 150ms,
 		stroke 150ms,
 		transform 150ms;
 }
-.pswp__button--pick.is-picked {
-	opacity: 1;
+.pswp__pick.is-picked {
+	border-color: var(--color-accent, #f2a35e);
+	background: color-mix(in oklab, var(--color-accent, #f2a35e) 18%, #141416);
 }
-.pswp__button--pick.is-picked svg {
+.pswp__pick.is-picked svg {
 	fill: var(--color-accent, #f2a35e);
 	stroke: var(--color-accent, #f2a35e);
-	transform: scale(1.08);
+	transform: scale(1.1);
 }
